@@ -65,6 +65,10 @@ export function Phone({ framed }: { framed: boolean }) {
   const { stack } = useNavState();
   const top = stack[stack.length - 1]?.name;
   const showStatus = framed && !NO_STATUS_BAR.has(top);
+  // Colors the real phone's status bar to match the app's canvas (light #f9f9fb, dark #0d0c10).
+  useEffect(() => {
+    if (!framed) document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0d0c10' : '#f9f9fb');
+  }, [dark, framed]);
   return (
     <div className={`phone ${framed ? '' : 'fullscreen'} ${dark ? 'theme-dark' : ''}`}>
       <Navigator />

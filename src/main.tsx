@@ -11,6 +11,11 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>,
 );
 
+// Makes the site installable as an app (Chrome's "Install app"). Skipped inside embeds such as the Claude artifact viewer.
+if (import.meta.env.PROD && 'serviceWorker' in navigator && window.self === window.top) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+}
+
 // Dev-only handle for automated checks.
 if (import.meta.env.DEV) {
   Promise.all([import('./data/app'), import('./lib/nav'), import('./catalog')]).then(([a, n, c]) => {
