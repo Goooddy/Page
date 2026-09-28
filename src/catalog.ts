@@ -76,8 +76,8 @@ export const CATALOG: CatalogSection[] = [
     items: [
       { id: '32:4', title: 'Launch', go: signedOut([['launch']]) },
       { id: '355:1964', title: 'Onboarding carousel — slide 1', go: signedOut([['onboarding', { slide: 0 }]]) },
-      { id: '363:2635', title: 'Onboarding carousel — slide 2', go: signedOut([['onboarding', { slide: 1 }]]), hint: 'Swipe the carousel' },
-      { id: '363:2665', title: 'Onboarding carousel — slide 3', go: signedOut([['onboarding', { slide: 2 }]]), hint: 'Swipe the carousel' },
+      { id: '363:2635', title: 'Onboarding carousel — slide 2', go: signedOut([['onboarding', { slide: 1 }]]), hint: 'Tap Next or swipe' },
+      { id: '363:2665', title: 'Onboarding carousel — slide 3', go: signedOut([['onboarding', { slide: 2 }]]), hint: 'Tap Next or swipe' },
     ],
   },
   {
