@@ -1,0 +1,176 @@
+/* Page234 design tokens — generated from the Figma variable collections
+   (Primitives, Color [Light/Dark], Scale, Avatar Palette) and text/effect styles. */
+
+:root {
+  /* Primitives */
+  --blue-50: #f2f6fd; --blue-100: #e1eafa; --blue-200: #c2d5f4; --blue-300: #97b6ed; --blue-400: #5a8ce2;
+  --blue-500: #2467db; --blue-600: #1e57b8; --blue-700: #194999; --blue-800: #143a7b; --blue-900: #102a5b; --blue-950: #0b1b3d;
+  --green-50: #eefcf4; --green-100: #d4f7e4; --green-200: #a9efc9; --green-300: #6fe2a3; --green-400: #18dc71;
+  --green-500: #00c458; --green-600: #009e4a; --green-700: #037c3e; --green-800: #056133; --green-900: #064727;
+  --neutral-0: #ffffff; --neutral-25: #fcfcfd; --neutral-50: #f9f9fb; --neutral-100: #f2f2f5; --neutral-200: #e6e5eb;
+  --neutral-300: #d3d2db; --neutral-400: #a2a0ac; --neutral-450: #7f7d8a; --neutral-500: #6d6d6d; --neutral-600: #56555e;
+  --neutral-700: #413f4a; --neutral-800: #2d2b36; --neutral-900: #1d1b25; --neutral-950: #050505;
+  --ink-deep: #050505; --ink-base: #0d0c10; --ink-raised: #17161b; --ink-overlay: #222027; --ink-line: #29272f;
+  --ink-border: #35333d; --ink-strong: #484653; --ink-interactive: #7a7886;
+  --indigo-base: #0d0630; --indigo-raised: #1d1547; --indigo-border: #453c77;
+  --amber-50: #fef8e6; --amber-100: #feedc3; --amber-200: #fdd888; --amber-300: #fcc451; --amber-400: #fab11e;
+  --amber-500: #ef9906; --amber-600: #c77605; --amber-700: #9b5608; --amber-800: #733d07;
+  --rose-50: #feeced; --rose-100: #fdd8db; --rose-400: #ec5160; --rose-500: #df2a3c; --rose-600: #c11f30;
+  --rose-700: #9e1a25; --rose-800: #75151b; --rose-900: #3a0a0e;
+
+  /* Scale */
+  --radius-xs: 4px; --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 24px; --radius-full: 999px;
+  --inset-top: 44px; --inset-bottom: 34px;
+
+  /* Color — Light */
+  --surface-canvas: var(--neutral-50);
+  --surface-default: var(--neutral-0);
+  --surface-raised: var(--neutral-0);
+  --surface-sunken: var(--neutral-100);
+  --surface-inverse: var(--indigo-base);
+  --surface-hover: var(--neutral-100);
+  --surface-press: var(--neutral-200);
+  --surface-brand: var(--indigo-base);
+  --surface-brand-bleed: var(--indigo-base);
+  --surface-brand-border: var(--indigo-border);
+  --surface-disabled: var(--neutral-100);
+  --surface-own-message: var(--blue-100);
+  --surface-other-message: var(--neutral-0);
+  --border-subtle: var(--neutral-200);
+  --border-default: var(--neutral-300);
+  --border-strong: var(--neutral-400);
+  --border-focus: var(--blue-500);
+  --border-interactive: var(--neutral-450);
+  --border-disabled: var(--neutral-200);
+  --text-primary: var(--indigo-base);
+  --text-secondary: var(--neutral-600);
+  --text-tertiary: var(--neutral-500);
+  --text-inverse: var(--neutral-0);
+  --text-link: var(--blue-700);
+  --text-on-fill: var(--neutral-0);
+  --text-on-brand: var(--neutral-25);
+  --text-disabled: var(--neutral-400);
+  --action-primary: var(--blue-700);
+  --action-primary-hover: var(--blue-800);
+  --action-primary-press: var(--blue-900);
+  --action-primary-text: var(--neutral-0);
+  --action-subtle: var(--blue-50);
+  --action-subtle-text: var(--blue-700);
+  --accent-fill: var(--green-500);
+  --accent-text: var(--green-700);
+  --accent-surface: var(--green-50);
+  --accent-border: var(--green-200);
+  --accent-on-fill: var(--ink-base);
+  --success-text: var(--green-700); --success-fill: var(--green-500); --success-surface: var(--green-50); --success-on-fill: var(--ink-base);
+  --warning-text: var(--amber-700); --warning-fill: var(--amber-500); --warning-surface: var(--amber-50); --warning-on-fill: var(--ink-base);
+  --danger-text: var(--rose-600); --danger-fill: var(--rose-500); --danger-surface: var(--rose-50); --danger-on-fill: var(--neutral-0);
+  --info-text: var(--blue-700); --info-fill: var(--blue-500); --info-surface: var(--blue-50); --info-on-fill: var(--neutral-0);
+  --overlay-scrim: #0d063080;
+
+  --icon-default: var(--text-primary);
+  --icon-secondary: var(--text-secondary);
+  --icon-tertiary: var(--text-tertiary);
+  --icon-on-fill: var(--text-on-fill);
+  --icon-accent: var(--accent-text);
+  --icon-danger: var(--danger-text);
+  --icon-disabled: var(--text-disabled);
+  --icon-inverse: var(--text-inverse);
+
+  /* Effect styles */
+  --elevation-1: 0 1px 2px rgba(13, 6, 48, 0.06), 0 1px 3px rgba(13, 6, 48, 0.04);
+  --elevation-2: 0 2px 4px rgba(13, 6, 48, 0.05), 0 4px 12px rgba(13, 6, 48, 0.06);
+  --elevation-3: 0 8px 24px rgba(13, 6, 48, 0.12);
+
+  /* Avatar Palette default mode (Indigo) */
+  --tone-1: #0d0630; --tone-2: #1d1547; --tone-3: #2a2260; --tone-4: #143a7b; --tone-5: #194999;
+  --tone-6: #2467db; --tone-7: #5a8ce2; --tone-8: #97b6ed; --tone-9: #c2d5f4; --tone-10: #e1eafa;
+}
+
+/* Color — Dark */
+.theme-dark {
+  --surface-canvas: var(--ink-base);
+  --surface-default: var(--ink-raised);
+  --surface-raised: var(--ink-overlay);
+  --surface-sunken: var(--ink-deep);
+  --surface-inverse: var(--neutral-25);
+  --surface-hover: var(--ink-overlay);
+  --surface-press: var(--ink-line);
+  --surface-brand: var(--indigo-raised);
+  --surface-disabled: var(--ink-overlay);
+  --surface-own-message: var(--blue-800);
+  --surface-other-message: var(--ink-raised);
+  --border-subtle: var(--ink-line);
+  --border-default: var(--ink-border);
+  --border-strong: var(--ink-strong);
+  --border-focus: var(--blue-400);
+  --border-interactive: var(--ink-interactive);
+  --border-disabled: var(--ink-line);
+  --text-primary: var(--neutral-25);
+  --text-secondary: var(--neutral-300);
+  --text-tertiary: var(--neutral-400);
+  --text-inverse: var(--ink-base);
+  --text-link: var(--blue-300);
+  --text-disabled: var(--neutral-500);
+  --action-primary: var(--blue-500);
+  --action-primary-hover: var(--blue-400);
+  --action-primary-press: var(--blue-300);
+  --action-subtle: var(--blue-900);
+  --action-subtle-text: var(--blue-300);
+  --accent-text: var(--green-400);
+  --accent-surface: var(--green-900);
+  --accent-border: var(--green-800);
+  --success-text: var(--green-400); --success-surface: var(--green-900);
+  --warning-text: var(--amber-400); --warning-surface: var(--amber-800);
+  --danger-text: var(--rose-400); --danger-surface: var(--rose-900);
+  --info-text: var(--blue-300); --info-surface: var(--blue-950);
+  --overlay-scrim: #05050599;
+
+  --icon-default: var(--text-primary);
+  --icon-secondary: var(--text-secondary);
+  --icon-tertiary: var(--text-tertiary);
+  --icon-on-fill: var(--text-on-fill);
+  --icon-accent: var(--accent-text);
+  --icon-danger: var(--danger-text);
+  --icon-disabled: var(--text-disabled);
+  --icon-inverse: var(--text-inverse);
+
+  --elevation-1: 0 1px 3px rgba(0, 0, 0, 0.28);
+  --elevation-2: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --elevation-3: 0 8px 28px rgba(0, 0, 0, 0.56);
+}
+
+/* Avatar Palette modes */
+.pal-indigo { --tone-1: #0d0630; --tone-2: #1d1547; --tone-3: #2a2260; --tone-4: #143a7b; --tone-5: #194999; --tone-6: #2467db; --tone-7: #5a8ce2; --tone-8: #97b6ed; --tone-9: #c2d5f4; --tone-10: #e1eafa; }
+.pal-forest { --tone-1: #052e19; --tone-2: #064727; --tone-3: #056133; --tone-4: #037c3e; --tone-5: #009e4a; --tone-6: #00c458; --tone-7: #18dc71; --tone-8: #6fe2a3; --tone-9: #a9efc9; --tone-10: #d4f7e4; }
+.pal-clay { --tone-1: #4a2705; --tone-2: #733d07; --tone-3: #9b5608; --tone-4: #c77605; --tone-5: #ef9906; --tone-6: #fab11e; --tone-7: #fcc451; --tone-8: #fdd888; --tone-9: #feedc3; --tone-10: #fef8e6; }
+.pal-rose { --tone-1: #4d0e13; --tone-2: #75151b; --tone-3: #9e1a25; --tone-4: #c11f30; --tone-5: #df2a3c; --tone-6: #ec5160; --tone-7: #f2808b; --tone-8: #f8aeb5; --tone-9: #fdd8db; --tone-10: #feeced; }
+.pal-teal { --tone-1: #06282f; --tone-2: #0a3b46; --tone-3: #0f5666; --tone-4: #147a90; --tone-5: #1896bc; --tone-6: #2fb3d4; --tone-7: #67cbe2; --tone-8: #9adfef; --tone-9: #c6ecf6; --tone-10: #e4f6fb; }
+.pal-plum { --tone-1: #2b0b3d; --tone-2: #401356; --tone-3: #5a1d75; --tone-4: #762a96; --tone-5: #9139b5; --tone-6: #a95fc8; --tone-7: #c189d8; --tone-8: #d6b1e6; --tone-9: #e8d4f2; --tone-10: #f5ecfa; }
+
+/* Text styles */
+.t-display-l { font: 700 34px/40px var(--font); letter-spacing: -0.021em; }
+.t-display { font: 700 28px/34px var(--font); letter-spacing: -0.02em; }
+.t-title-l { font: 700 22px/28px var(--font); letter-spacing: -0.015em; }
+.t-title { font: 600 20px/26px var(--font); letter-spacing: -0.012em; }
+.t-title-s { font: 600 17px/24px var(--font); letter-spacing: -0.008em; }
+.t-body-l { font: 400 17px/26px var(--font); }
+.t-body { font: 400 15px/22px var(--font); }
+.t-body-s { font: 400 13px/18px var(--font); }
+.t-label-l { font: 600 15px/20px var(--font); letter-spacing: -0.005em; }
+.t-label { font: 600 13px/16px var(--font); letter-spacing: 0.005em; }
+.t-label-s { font: 600 11px/14px var(--font); letter-spacing: 0.02em; }
+.t-caption { font: 400 12px/16px var(--font); }
+.t-overline { font: 700 11px/14px var(--font); letter-spacing: 0.08em; }
+.t-quote { font: 400 17px/28px var(--font); letter-spacing: -0.005em; }
+
+/* Text colours */
+.c-primary { color: var(--text-primary); }
+.c-secondary { color: var(--text-secondary); }
+.c-tertiary { color: var(--text-tertiary); }
+.c-link { color: var(--text-link); }
+.c-inverse { color: var(--text-inverse); }
+.c-disabled { color: var(--text-disabled); }
+.c-danger { color: var(--danger-text); }
+.c-accent { color: var(--accent-text); }
+.c-warning { color: var(--warning-text); }
+.c-on-fill { color: var(--text-on-fill); }
