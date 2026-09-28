@@ -5,6 +5,7 @@ import { Button, Chip, ClubAvatar, OnboardingProgress, SocialButton } from '../c
 import { TextField } from '../components/ui/inputs';
 import { Icon } from '../components/Icon';
 import { app, useApp } from '../data/app';
+import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '../data/demoAccounts';
 
 export const EXISTING_EMAIL = 'samuel@example.com';
 const isEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
@@ -62,7 +63,7 @@ export function SignUp({ params }: { params: Params }) {
   function submit() {
     const e: typeof err = {};
     if (!isEmail(email)) e.email = 'format';
-    else if (email.trim().toLowerCase() === EXISTING_EMAIL || app.get().accounts[email.trim().toLowerCase()]) e.email = 'used';
+    else if (email.trim().toLowerCase() === EXISTING_EMAIL || app.get().accounts[email.trim().toLowerCase()] || DEMO_ACCOUNTS[email.trim().toLowerCase()]) e.email = 'used';
     if (pw.length < 8) e.pw = true;
     setErr(e);
     if (e.email || e.pw) return;
@@ -309,7 +310,8 @@ const STARTER = [
 export function JoinBookclubs() {
   const [joined, setJoined] = useState<Record<string, boolean>>(() => Object.fromEntries(STARTER.map((c) => [c.id, c.action === 'joined'])));
   const count = Object.values(joined).filter(Boolean).length;
-  const finish = () => { app.signIn(); };
+  // Joining none leads to the empty Home ("Nothing here yet").
+  const finish = () => { app.set({ hasClubs: count > 0 }); app.signIn(); };
   return (
     <StepScreen
       step={3}
@@ -369,12 +371,15 @@ export function LogIn({ params }: { params: Params }) {
     if (!email.trim() || !pw || err === 'locked') return;
     const accounts = app.get().accounts;
     const key = email.trim().toLowerCase();
-    const known = key === EXISTING_EMAIL || key in accounts;
-    const ok = known && (accounts[key] == null || accounts[key] === pw);
+    const demo = DEMO_ACCOUNTS[key];
+    const known = key === EXISTING_EMAIL || key in accounts || !!demo;
+    // A password set in this session wins; demo accounts otherwise use the shared demo password.
+    const expected = key in accounts ? accounts[key] : demo ? DEMO_PASSWORD : null;
+    const ok = known && (expected == null || expected === pw);
     setBusy(true);
     setTimeout(() => {
       setBusy(false);
-      if (ok) { app.set({ loginFails: 0 }); app.signIn(); return; }
+      if (ok) { app.set((st) => ({ loginFails: 0, user: { ...st.user, email: email.trim() } })); app.signIn(demo); return; }
       const fails = app.get().loginFails + 1;
       app.set({ loginFails: fails });
       setErr(fails >= 3 ? 'locked' : 'mismatch');

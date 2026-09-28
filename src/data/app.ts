@@ -86,9 +86,11 @@ export const app = {
     clearTimeout(toastTimer);
     appStore.set({ toast: null });
   },
-  signIn() {
-    appStore.set({ signedIn: true });
+  /** `as` = a demo account's plan, plus a sheet to open once Home has loaded. */
+  signIn(as?: { plan: AppState['plan']; sheet?: AppState['sheet'] }) {
+    appStore.set({ signedIn: true, ...(as ? { plan: as.plan } : null) });
     nav.reset([['home']], 'fade');
+    if (as?.sheet) setTimeout(() => appStore.set({ sheet: as.sheet ?? null }), 1100);
   },
   isLoaded(key: string) {
     const l = appStore.get().loaded;

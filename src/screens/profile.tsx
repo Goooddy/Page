@@ -12,6 +12,7 @@ import { useFirstLoad } from './home';
 import { GENRES } from './auth';
 import { EXISTING_EMAIL } from './auth';
 import { signOutAll } from '../data/reset';
+import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '../data/demoAccounts';
 
 const THEME_LABEL: Record<Theme, string> = { system: 'Match my phone', light: 'Light', dark: 'Dark' };
 
@@ -244,7 +245,8 @@ const ResetLink = () => (
   <p className="t-body-s c-tertiary">Don’t remember it? <button className="c-link" style={{ fontWeight: 600 }} onClick={() => nav.push('forgot', { email: app.get().user.email })}>Reset by email instead</button></p>
 );
 const checkCurrent = (pw: string) => {
-  const stored = app.get().accounts[app.get().user.email.toLowerCase()];
+  const key = app.get().user.email.toLowerCase();
+  const stored = app.get().accounts[key] ?? (DEMO_ACCOUNTS[key] ? DEMO_PASSWORD : null);
   return stored ? pw === stored : pw.length >= 8;
 };
 
