@@ -135,7 +135,7 @@ export function Onboarding({ params }: { params: Params }) {
         {i < 2
           ? <Button full onClick={() => setI(i + 1)}>Next</Button>
           : <Button full onClick={() => nav.push('signup')}>Begin my journey</Button>}
-        <button className="t-body-s c-tertiary tc fill" onClick={() => nav.push('login')}>Already here?&nbsp; Log in</button>
+        <button className="t-body-s c-tertiary tc fill" onClick={() => nav.push('login')}>Already here?&nbsp; <span className="c-link" style={{ fontWeight: 600 }}>Log in</span></button>
       </PinnedFooter>
     </div>
   );
