@@ -73,8 +73,10 @@ export function KeepActive() {
           </div>
           {rooms.map(([id, name, meta], i) => {
             const on = keep.includes(id);
+            // Once 3 are chosen, the rest fade (Figma: 55% opacity) and can't be picked until one is unticked.
+            const faded = !on && keep.length >= 3;
             return (
-              <button key={id} className="row fill" style={{ padding: '8px 0', gap: 12 }} onClick={() => toggle(id)}>
+              <button key={id} className="row fill" style={{ padding: '8px 0', gap: 12, opacity: faded ? 0.55 : 1, transition: 'opacity 150ms' }} onClick={() => toggle(id)}>
                 <Checkbox on={on} />
                 <ClubAvatar art={i + 1} size={32} />
                 <span className="col grow" style={{ gap: 2 }}>
