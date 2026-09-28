@@ -25,8 +25,11 @@ type ChatState = {
   replies: Record<string, Reply[]>;
   catchupHidden: Record<string, boolean>;
   primingDone: boolean;
+  /** Bookclubs whose chat has been opened before, and where Jump to latest was used. */
+  visited: Record<string, boolean>;
+  jumped: Record<string, boolean>;
 };
-export const chatStore = createStore<ChatState>({ chats: {}, replies: {}, catchupHidden: {}, primingDone: false });
+export const chatStore = createStore<ChatState>({ chats: {}, replies: {}, catchupHidden: {}, primingDone: false, visited: {}, jumped: {} });
 export const useChat = <R,>(sel: (s: ChatState) => R) => useStoreValue(chatStore, sel);
 
 export const getChat = (club: string) => chatStore.get().chats[club] ?? chatSeed();
@@ -62,7 +65,7 @@ function deliver(update: (id: string, p: Partial<ChatMsg>) => void, id: string) 
 }
 
 export const chat = {
-  reset() { chatStore.set({ chats: {}, replies: {}, catchupHidden: {}, primingDone: false }); },
+  reset() { chatStore.set({ chats: {}, replies: {}, catchupHidden: {}, primingDone: false, visited: {}, jumped: {} }); },
   seed(club: string, items: ChatItem[]) { chatStore.set((s) => ({ chats: { ...s.chats, [club]: items } })); },
   seedReplies(key: string, items: Reply[]) { chatStore.set((s) => ({ replies: { ...s.replies, [key]: items } })); },
   send(club: string, body: string, quote?: ChatMsg['quote']) {
@@ -123,4 +126,6 @@ export const chat = {
     }));
   },
   markPrimed() { chatStore.set({ primingDone: true }); },
+  markVisited(club: string) { chatStore.set((s) => ({ visited: { ...s.visited, [club]: true } })); },
+  markJumped(club: string) { chatStore.set((s) => ({ jumped: { ...s.jumped, [club]: true } })); },
 };

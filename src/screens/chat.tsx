@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { nav, type Params } from '../lib/nav';
 import { app, useApp } from '../data/app';
-import { chat, getChat, useChat } from '../data/chat';
+import { chat, chatStore, getChat, useChat } from '../data/chat';
 import { clubById, clubs, useClubs } from '../data/clubs';
 import {
   CatchUpStrip, JumpToLatest, Message, ReactionRow, SelectRow, SelectionBar, ThreadHeader, isMsg,
@@ -82,6 +82,10 @@ export function Chat({ params }: { params: Params }) {
   const [sheet, setSheet] = useState<Sheet>((params.sheet as Sheet) ?? null);
   const [dialog, setDialog] = useState<DialogKind>((params.dialog as DialogKind) ?? null);
   const [atBottom, setAtBottom] = useState(false);
+  // Jump to latest shows only the first time this chat is opened, and goes for good once tapped.
+  const firstVisit = useRef(!chatStore.get().visited[clubId]);
+  const jumped = useChat((s) => !!s.jumped[clubId]);
+  useEffect(() => { chat.markVisited(clubId); }, [clubId]);
   const [target, setTarget] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -247,9 +251,9 @@ export function Chat({ params }: { params: Params }) {
           </div>
         )}
       </div>
-      {!atBottom && !loading && !selecting && !mentionOpts.length && (
+      {firstVisit.current && !jumped && !atBottom && !loading && !selecting && !mentionOpts.length && (
         <div style={{ position: 'absolute', left: 0, right: 0, bottom: replyTo ? 201 : editing ? 179 : 121, display: 'flex', justifyContent: 'center', zIndex: 6, pointerEvents: 'none' }}>
-          <span style={{ pointerEvents: 'auto' }}><JumpToLatest onClick={() => toBottom()} /></span>
+          <span style={{ pointerEvents: 'auto' }}><JumpToLatest onClick={() => { chat.markJumped(clubId); toBottom(); }} /></span>
         </div>
       )}
       <MessageComposer

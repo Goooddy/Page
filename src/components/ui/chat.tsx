@@ -214,13 +214,13 @@ export function ThreadHeader({ title, subtitle, club, muted, loader, onBack, onM
         <button className="icon-btn" onClick={onBack ?? (() => nav.pop())} aria-label="Back"><Icon name="CaretLeft" size={24} /></button>
         <div className="row grow" style={{ gap: 8, minWidth: 0 }}>
           {club && <ClubAvatar art={club.art} palette={club.palette} size={40} />}
-          <div className="col" style={{ gap: 2, minWidth: 0, alignItems: 'center' }}>
+          <div className="col" style={{ gap: 2, minWidth: 0, alignItems: 'flex-start' }}>
             <span className="row" style={{ gap: 4, maxWidth: '100%' }}>
-              <span className="t-label-l c-primary trunc tc">{title}</span>
+              <span className="t-label-l c-primary trunc">{title}</span>
               {muted && <Icon name="BellSlash" size={16} tone="secondary" />}
             </span>
-            <span className="row">
-              <span className="t-caption c-secondary tc trunc">{subtitle}</span>
+            <span className="row" style={{ maxWidth: '100%' }}>
+              <span className="t-caption c-secondary trunc">{subtitle}</span>
               {loader && <TypingDots />}
             </span>
           </div>
