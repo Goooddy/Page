@@ -4,11 +4,10 @@ import { app, useApp } from '../data/app';
 import { AppBar, PinnedFooter, Screen } from '../components/ui/nav';
 import { Button, Chip, ClubAvatar, SectionHeader } from '../components/ui/core';
 import { AlertRow, SettingsRow, type AlertData } from '../components/ui/rows';
-import { ConnectionBanner, EmptyState, Shimmer, Skeleton } from '../components/ui/states';
+import { ConnectionBanner, EmptyState, HEADER_BOTTOM, Shimmer, Skeleton } from '../components/ui/states';
 import { Icon } from '../components/Icon';
 import { createStore, useStoreValue } from '../lib/store';
 import { useFirstLoad } from './home';
-import { LargeHeader } from './bookclubs';
 import { BookCardView } from './discover';
 
 type Alert = AlertData & { initials: string; go?: () => void };
@@ -65,11 +64,11 @@ export function Alerts({ params }: { params: Params }) {
   const list = useAlerts((s) => s.list);
   const [filter, setFilter] = useState<'all' | 'unread'>('all');
   const anyUnread = list.some((a) => a.unread);
-  const header = <LargeHeader title="Alerts" textAction={anyUnread || params.markable ? { label: 'Mark all read', onClick: alerts.readAll } : undefined} />;
+  const header = <AppBar variant="root" title="Alerts" textAction={anyUnread || params.markable ? { label: 'Mark all read', onClick: alerts.readAll } : undefined} />;
 
   if (loading) {
     return (
-      <Screen header={<LargeHeader title="Alerts" />} tab="alerts" noScroll overlay={<Shimmer top={138} bottom={102} />}>
+      <Screen header={<AppBar variant="root" title="Alerts" />} tab="alerts" noScroll overlay={<Shimmer top={HEADER_BOTTOM} bottom={102} />}>
         <div className="col" style={{ padding: '16px 16px 0', gap: 12 }}>
           {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} type="message" />)}
         </div>

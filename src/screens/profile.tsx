@@ -5,7 +5,7 @@ import { AppBar, PinnedFooter, Screen } from '../components/ui/nav';
 import { Avatar, Button, Chip, ClubAvatar, RadioRow, SectionHeader, StatusPill } from '../components/ui/core';
 import { SelectField, TextArea, TextField } from '../components/ui/inputs';
 import { Hairline, PreferenceRow, SettingsRow } from '../components/ui/rows';
-import { Shimmer, Skeleton } from '../components/ui/states';
+import { HEADER_BOTTOM, Shimmer, Skeleton } from '../components/ui/states';
 import { Dialog } from '../components/ui/overlays';
 import logo from '../assets/img/logo.svg';
 import { useFirstLoad } from './home';
@@ -27,7 +27,7 @@ export function Profile({ params }: { params: Params }) {
   const header = <AppBar variant="root" title="Profile" />;
   if (loading) {
     return (
-      <Screen header={header} tab="profile" noScroll overlay={<Shimmer top={96} bottom={102} />}>
+      <Screen header={header} tab="profile" noScroll overlay={<Shimmer top={HEADER_BOTTOM} bottom={102} />}>
         <div className="col" style={{ padding: '58px 16px 0', gap: 12 }}>
           <Skeleton type="row" /><Skeleton type="card" /><Skeleton type="row" /><Skeleton type="row" /><Skeleton type="row" />
         </div>

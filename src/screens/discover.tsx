@@ -5,13 +5,12 @@ import { AppBar, PinnedFooter, Screen } from '../components/ui/nav';
 import { BookCover, Button, Chip, ClubAvatar, IconButton, SectionHeader, StatusPill } from '../components/ui/core';
 import { SearchField } from '../components/ui/inputs';
 import { MemberRow, SettingsRow } from '../components/ui/rows';
-import { ConnectionBanner, EmptyState, ErrorState, Shimmer, Skeleton } from '../components/ui/states';
-import { MenuRow, Popover } from '../components/ui/overlays';
+import { ConnectionBanner, EmptyState, ErrorState, HEADER_BOTTOM, Shimmer, Skeleton } from '../components/ui/states';
+import { MENU_TOP, MenuRow, Popover } from '../components/ui/overlays';
 import { Message } from '../components/ui/chat';
 import { Icon, type IconName } from '../components/Icon';
 import { clubs, useClubs } from '../data/clubs';
 import { DiscoverRowView } from './auth';
-import { LargeHeader } from './bookclubs';
 import { useFirstLoad } from './home';
 import { ReasonSheet, ReportFormSheet } from './chat';
 import { withFreeSlot } from './misc';
@@ -54,7 +53,7 @@ export function Discover({ params }: { params: Params }) {
   const [failed, setFailed] = useState(!!params.failed || (offline && !loadedBefore));
   const loading = useFirstLoad('discover', params.loading as boolean || failed);
   const [genre, setGenre] = useState('All');
-  const header = <LargeHeader title="Discover" />;
+  const header = <AppBar variant="root" title="Discover" />;
 
   if (failed) {
     return (
@@ -66,7 +65,7 @@ export function Discover({ params }: { params: Params }) {
   }
   if (loading) {
     return (
-      <Screen header={header} tab="discover" noScroll overlay={<Shimmer top={138} bottom={102} />}>
+      <Screen header={header} tab="discover" noScroll overlay={<Shimmer top={HEADER_BOTTOM} bottom={102} />}>
         <div className="col" style={{ padding: '16px 16px 0', gap: 12 }}>
           <Skeleton type="card" /><Skeleton type="card" /><Skeleton type="row" /><Skeleton type="row" /><Skeleton type="card" />
         </div>
@@ -236,7 +235,7 @@ export function ClubPreview({ params }: { params: Params }) {
       {menu && (
         <>
           <div className="scrim" onClick={() => setMenu(false)} />
-          <Popover style={{ top: 90, right: 8, width: 232, padding: 8 }}>
+          <Popover style={{ top: MENU_TOP, right: 8, width: 232, padding: 8 }}>
             <MenuRow icon="LinkSimple" label="Share bookclub" onClick={() => { navigator.clipboard?.writeText('page234.com/r/midnight-readers-37488').catch(() => {}); setMenu(false); }} />
             <MenuRow icon="Flag" label="Report bookclub" tone="destructive" onClick={() => { setMenu(false); setSheet('report'); }} />
           </Popover>

@@ -225,7 +225,7 @@ export function ThreadHeader({ title, subtitle, club, muted, loader, onBack, onM
             </span>
           </div>
         </div>
-        <button className="icon-btn" onClick={onMore} aria-label="More"><Icon name="DotsThree" size={24} /></button>
+        {onMore && <button className="icon-btn" onClick={onMore} aria-label="More"><Icon name="DotsThree" size={24} /></button>}
       </div>
     </header>
   );

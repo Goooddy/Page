@@ -21,7 +21,7 @@ type AppBarProps = {
   backIcon?: IconName;
   actions?: ReactNode;
   textAction?: { label: string; onClick?: () => void; disabled?: boolean };
-  variant?: 'default' | 'root' | 'text' | 'large';
+  variant?: 'default' | 'root' | 'text';
   subtitle?: ReactNode;
   style?: CSSProperties;
   bordered?: boolean;
@@ -34,7 +34,12 @@ export function AppBar({ title, back = true, onBack, backIcon = 'CaretLeft', act
     return (
       <header className="appbar" style={{ ...shadow, ...style }}>
         <div className="bar" style={{ padding: '0 8px 0 16px' }}>
-          <span className="t-title c-primary grow trunc">{title}</span>
+          <span className="t-title-l c-primary grow trunc">{title}</span>
+          {textAction && (
+            <button className={`t-label-l ${textAction.disabled ? 'c-disabled' : 'c-link'}`} style={{ padding: '12px' }} onClick={textAction.onClick} disabled={textAction.disabled}>
+              {textAction.label}
+            </button>
+          )}
           {actions}
         </div>
       </header>

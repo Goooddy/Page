@@ -105,6 +105,10 @@ export function PromptSheet({ icon, illustration, title, body, primary, secondar
   );
 }
 
+/** Header ••• menus open just under the bar; the select-mode ••• menu sits 2px lower (Figma: 105 and 107 under a 59px inset). */
+export const MENU_TOP = 'calc(var(--inset-top) + 46px)';
+export const ACTION_MENU_TOP = 'calc(var(--inset-top) + 48px)';
+
 export function Popover({ children, style }: { children: ReactNode; style?: CSSProperties }) {
   return <div className="popover" style={{ position: 'absolute', zIndex: 45, ...style }}>{children}</div>;
 }

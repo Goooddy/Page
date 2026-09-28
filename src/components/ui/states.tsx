@@ -81,7 +81,10 @@ export function Skeleton({ type }: { type: 'row' | 'message' | 'card' }) {
 }
 
 /** The shimmer sweep drawn over loading screens (“1.2s left-to-right sweep, ease-in-out, loops”). */
-export function Shimmer({ top = 0, bottom = 0 }: { top?: number; bottom?: number }) {
+/** Where a standard header (status-bar inset + 52px bar) ends, e.g. for loading overlays. */
+export const HEADER_BOTTOM = 'calc(var(--inset-top) + 52px)';
+
+export function Shimmer({ top = 0, bottom = 0 }: { top?: number | string; bottom?: number }) {
   return (
     <div style={{ position: 'absolute', left: 0, right: 0, top, bottom, overflow: 'hidden', pointerEvents: 'none', zIndex: 3 }}>
       <div className="shimmer-sweep" />

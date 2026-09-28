@@ -6,7 +6,7 @@ import { clubById } from '../data/clubs';
 import { Message, PinnedParent, ReactionRow, SelectRow, SelectionBar, ThreadHeader, isMsg, type ChatMsg, type SelAction } from '../components/ui/chat';
 import { MessageComposer, MentionPicker } from '../components/ui/inputs';
 import { EmptyState, ErrorState, ConnectionBanner, Skeleton } from '../components/ui/states';
-import { Dialog, MenuRow, Popover, PromptSheet } from '../components/ui/overlays';
+import { ACTION_MENU_TOP, Dialog, MenuRow, Popover, PromptSheet } from '../components/ui/overlays';
 import { Icon } from '../components/Icon';
 import { MENTIONS, ReasonSheet, ReportFormSheet, mentionQuery } from './chat';
 
@@ -103,7 +103,8 @@ export function Thread({ params }: { params: Params }) {
     const scr = screenRef.current;
     if (!row || !scr) return;
     const scale = scr.getBoundingClientRect().height / scr.offsetHeight || 1;
-    setRxTop(Math.max(100, (row.getBoundingClientRect().top - scr.getBoundingClientRect().top) / scale - 52));
+    const hdr = (scr.querySelector('header') as HTMLElement | null)?.offsetHeight ?? 97;
+    setRxTop(Math.max(hdr + 3, (row.getBoundingClientRect().top - scr.getBoundingClientRect().top) / scale - 52));
   }, [one, replies]);
 
   const onAction = (a: SelAction) => {
@@ -137,7 +138,7 @@ export function Thread({ params }: { params: Params }) {
       {sel.length ? (
         <SelectionBar count={sel.length} actions={actions} onClose={exitSel} onAction={onAction} />
       ) : (
-        <ThreadHeader title="Thread" subtitle={club.name} onMore={() => {}} />
+        <ThreadHeader title="Thread" subtitle={club.name} />
       )}
       {offline && <ConnectionBanner state="offline" />}
       {params.removed ? (
@@ -212,7 +213,7 @@ export function Thread({ params }: { params: Params }) {
       {more && one && (
         <>
           <div style={{ position: 'absolute', inset: 0, zIndex: 30 }} onClick={() => setMore(false)} />
-          <Popover style={{ top: 92, right: 8, width: 200, zIndex: 31 }}>
+          <Popover style={{ top: ACTION_MENU_TOP, right: 8, width: 200, zIndex: 31 }}>
             {one.you ? (
               <MenuRow icon="PencilSimple" label="Edit" onClick={() => { setEditing(one.id); setDraft(one.body); exitSel(); }} />
             ) : (

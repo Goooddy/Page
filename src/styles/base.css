@@ -69,7 +69,7 @@ svg { display: block; flex-shrink: 0; }
 .phone input, .phone textarea { user-select: text; }
 
 .status-bar {
-  position: absolute; top: 0; left: 0; right: 0; height: 44px; z-index: 50; pointer-events: none;
+  position: absolute; top: 0; left: 0; right: 0; height: 54px; z-index: 50; pointer-events: none;
   display: flex; align-items: center; justify-content: space-between; padding: 0 24px; color: var(--text-primary);
 }
 .status-bar.light { color: #ffffff; }

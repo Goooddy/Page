@@ -1,27 +1,13 @@
 import { useState } from 'react';
 import { nav, type Params } from '../lib/nav';
 import { app, useApp } from '../data/app';
-import { Screen } from '../components/ui/nav';
+import { AppBar, Screen } from '../components/ui/nav';
 import { Chip, FAB, IconButton } from '../components/ui/core';
 import { ArchivedRow, BookclubRow } from '../components/ui/rows';
-import { ConnectionBanner, EmptyState, Shimmer, Skeleton } from '../components/ui/states';
-import { MenuRow, Popover } from '../components/ui/overlays';
+import { ConnectionBanner, EmptyState, HEADER_BOTTOM, Shimmer, Skeleton } from '../components/ui/states';
+import { MENU_TOP, MenuRow, Popover } from '../components/ui/overlays';
 import { CLUBS, clubs, useClubs } from '../data/clubs';
 import { useFirstLoad } from './home';
-
-export function LargeHeader({ title, onMore, textAction }: { title: string; onMore?: () => void; textAction?: { label: string; onClick: () => void } }) {
-  return (
-    <header className="appbar" style={{ flexShrink: 0 }}>
-      <div className="bar" style={{ padding: '0 4px 0 16px', justifyContent: 'flex-end' }}>
-        {onMore && <IconButton icon="DotsThree" onClick={onMore} label="More" />}
-        {textAction && <button className="t-label-l c-link" style={{ padding: '12px 12px' }} onClick={textAction.onClick}>{textAction.label}</button>}
-      </div>
-      <div style={{ padding: '0 16px 8px' }}>
-        <h1 className="t-display c-primary tc">{title}</h1>
-      </div>
-    </header>
-  );
-}
 
 export function Bookclubs({ params }: { params: Params }) {
   const offline = useApp((s) => s.offline);
@@ -30,11 +16,11 @@ export function Bookclubs({ params }: { params: Params }) {
   const [filter, setFilter] = useState<'all' | 'unread' | 'owned'>('all');
   const [menu, setMenu] = useState(!!params.menu);
   const st = useClubs((s) => s);
-  const header = <LargeHeader title="Bookclubs" onMore={() => setMenu(true)} />;
+  const header = <AppBar variant="root" title="Bookclubs" actions={<IconButton icon="DotsThree" onClick={() => setMenu(true)} label="More" />} />;
 
   if (loading) {
     return (
-      <Screen header={header} tab="bookclubs" noScroll overlay={<Shimmer top={138} bottom={102} />}>
+      <Screen header={header} tab="bookclubs" noScroll overlay={<Shimmer top={HEADER_BOTTOM} bottom={102} />}>
         <div className="col" style={{ padding: '16px 16px 0', gap: 12 }}>
           {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} type="row" />)}
         </div>
@@ -67,7 +53,7 @@ export function Bookclubs({ params }: { params: Params }) {
           {menu && (
             <>
               <div className="scrim" onClick={() => setMenu(false)} />
-              <Popover style={{ top: 90, right: 8, width: 232, padding: 8 }}>
+              <Popover style={{ top: MENU_TOP, right: 8, width: 232, padding: 8 }}>
                 <MenuRow icon="Check" label="Mark all as read" onClick={() => { clubs.markAllRead(); app.set({ bookclubsDot: false }); setMenu(false); }} />
                 <MenuRow icon="Archive" label="Archived bookclubs" onClick={() => setMenu(false)} />
                 <MenuRow icon="Bell" label="Notification settings" onClick={() => { setMenu(false); nav.push('notification-prefs'); }} />

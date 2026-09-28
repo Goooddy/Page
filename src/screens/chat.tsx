@@ -10,7 +10,7 @@ import {
 import { Divider, Button, CheckboxRow } from '../components/ui/core';
 import { MessageComposer, MentionPicker, TextArea, type MentionOption } from '../components/ui/inputs';
 import { ConnectionBanner, EmptyState, Skeleton } from '../components/ui/states';
-import { Dialog, MenuRow, Popover, Sheet, SheetTitle } from '../components/ui/overlays';
+import { ACTION_MENU_TOP, Dialog, MENU_TOP, MenuRow, Popover, Sheet, SheetTitle } from '../components/ui/overlays';
 
 export const MENTIONS: MentionOption[] = [
   { name: 'Tobi Adeyemi', username: '@tobi', initials: 'TA' },
@@ -123,7 +123,8 @@ export function Chat({ params }: { params: Params }) {
     if (!row || !scr) return;
     const top = row.getBoundingClientRect().top - scr.getBoundingClientRect().top;
     const scale = scr.getBoundingClientRect().height / scr.offsetHeight || 1;
-    setRxTop(Math.max(100, top / scale - 52));
+    const hdr = (scr.querySelector('header') as HTMLElement | null)?.offsetHeight ?? 97;
+    setRxTop(Math.max(hdr + 3, top / scale - 52));
   }, [one, items]);
 
   const onScroll = () => {
@@ -279,7 +280,7 @@ export function Chat({ params }: { params: Params }) {
       {more && one && (
         <>
           <div style={{ position: 'absolute', inset: 0, zIndex: 30 }} onClick={() => setMore(false)} />
-          <Popover style={{ top: 92, right: 8, width: 200, zIndex: 31 }}>
+          <Popover style={{ top: ACTION_MENU_TOP, right: 8, width: 200, zIndex: 31 }}>
             {one.you ? (
               <MenuRow icon="PencilSimple" label="Edit" onClick={() => { setEditing(one.id); setDraft(one.body); setReplyTo(null); exitSel(); }} />
             ) : (
@@ -293,7 +294,7 @@ export function Chat({ params }: { params: Params }) {
       {menu && (
         <>
           <div className="scrim" onClick={() => setMenu(false)} />
-          <Popover style={{ top: 90, right: 8, width: 232, padding: 8 }}>
+          <Popover style={{ top: MENU_TOP, right: 8, width: 232, padding: 8 }}>
             <MenuRow icon="Users" label="Bookclub information" onClick={() => { setMenu(false); nav.push('club-info', { club: clubId }); }} />
             {!isPrivateMember && <MenuRow icon="UserPlus" label="Invite people" onClick={() => { setMenu(false); nav.modal('invite', { club: clubId }); }} />}
             {muted ? (

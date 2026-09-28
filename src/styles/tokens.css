@@ -20,7 +20,7 @@
 
   /* Scale */
   --radius-xs: 4px; --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-xl: 24px; --radius-full: 999px;
-  --inset-top: 44px; --inset-bottom: 34px;
+  --inset-top: 59px; --inset-bottom: 34px;
 
   /* Color — Light */
   --surface-canvas: var(--neutral-50);

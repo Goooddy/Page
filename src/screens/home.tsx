@@ -4,7 +4,7 @@ import { app, useApp } from '../data/app';
 import { AppBar, Screen } from '../components/ui/nav';
 import { Button, IconButton, SectionHeader } from '../components/ui/core';
 import { BookclubCard, BookclubRow } from '../components/ui/rows';
-import { ConnectionBanner, EmptyState, Shimmer, Skeleton } from '../components/ui/states';
+import { ConnectionBanner, EmptyState, HEADER_BOTTOM, Shimmer, Skeleton } from '../components/ui/states';
 import { Icon, type IconName } from '../components/Icon';
 import { clubById, useClubs } from '../data/clubs';
 
@@ -64,7 +64,7 @@ export function Home({ params }: { params: Params }) {
 
   if (loading) {
     return (
-      <Screen header={header} tab="home" noScroll overlay={<Shimmer top={96} bottom={102} />}>
+      <Screen header={header} tab="home" noScroll overlay={<Shimmer top={HEADER_BOTTOM} bottom={102} />}>
         <div className="col" style={{ padding: '16px 16px 0', gap: 12 }}>
           <Skeleton type="card" /><Skeleton type="card" /><Skeleton type="row" /><Skeleton type="row" /><Skeleton type="card" /><Skeleton type="row" />
         </div>
