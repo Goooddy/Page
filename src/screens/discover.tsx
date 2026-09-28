@@ -210,7 +210,7 @@ export function ClubPreview({ params }: { params: Params }) {
             {kind === 'public' ? (
               <>
                 <span className="t-label c-secondary fill">Recent conversation</span>
-                <div className="col fill" style={{ opacity: 0.4, pointerEvents: 'none' }}>
+                <div className="col fill" style={{ opacity: 0.45, pointerEvents: 'none' }}>
                   <Message m={{ id: 'p1', name: 'Amaka', time: '2:09 PM', body: 'I keep coming back to the statues in Chapter 16 — the way he counts them like a rosary.', likes: 24 }} />
                   <Message m={{ id: 'p2', name: 'Tobi', time: '2:14 PM', body: 'That reading hadn’t occurred to me. It reframes the whole second half.', likes: 24 }} />
                 </div>
