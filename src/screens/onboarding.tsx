@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import logo from '../assets/img/logo.svg';
+import logoMark from '../assets/img/logo-mark.svg';
+import logoWord from '../assets/img/logo-word.svg';
 import ill1 from '../assets/img/illustration-1.svg';
 import ill2 from '../assets/img/illustration-2.svg';
 import ill3 from '../assets/img/illustration-3.svg';
@@ -28,8 +30,21 @@ export function Launch({ params }: { params: Params }) {
   }
   return (
     <div className="screen tap" onClick={() => nav.reset([['onboarding', { slide: 0 }]])}>
-      <img src={logo} alt="Page 234" style={{ position: 'absolute', width: 209, height: 65.3, left: 'calc(50% - 104.5px)', top: 'calc(50% - 47px)' }} />
+      <AnimatedLogo />
       <p className="t-body-l c-tertiary tc" style={{ position: 'absolute', left: 0, right: 0, bottom: 62 }}>Welcome to a quieter space</p>
+    </div>
+  );
+}
+
+/** Figma Motion on "Launch": over 1s (linear, once) the mark turns from −180° to 0°
+ *  while the wordmark slides 157px in from behind it, inside a 138×32 clip. */
+function AnimatedLogo() {
+  return (
+    <div role="img" aria-label="Page 234" style={{ position: 'absolute', width: 209, height: 65.3, left: 'calc(50% - 104.5px)', top: 'calc(50% - 47px)' }}>
+      <img src={logoMark} alt="" className="launch-anim" style={{ position: 'absolute', left: 0, top: 0, width: 65.5, height: 65.3, animation: 'launchSpin 1s linear both' }} />
+      <div style={{ position: 'absolute', left: 73, top: 21.1, width: 138, height: 32, overflow: 'hidden' }}>
+        <img src={logoWord} alt="" className="launch-anim" style={{ position: 'absolute', left: 6.1, top: 1.12, width: 130, height: 28.55, animation: 'launchSlide 1s linear both' }} />
+      </div>
     </div>
   );
 }
