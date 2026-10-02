@@ -117,7 +117,7 @@ export function SignUp({ params }: { params: Params }) {
 }
 
 /* ——— Verify email ——— */
-const WRONG_CODE = '472915';
+const WRONG_CODE = '47291';
 export function VerifyEmail({ params }: { params: Params }) {
   const email = (params.email as string) || app.get().pending?.email || EXISTING_EMAIL;
   const [code, setCode] = useState((params.code as string) ?? '');
@@ -133,7 +133,7 @@ export function VerifyEmail({ params }: { params: Params }) {
   }, [left]);
 
   const verify = () => {
-    if (code.length < 6) return;
+    if (code.length < 5) return;
     if (left <= 0) { setState('expired'); return; }
     if (code === WRONG_CODE) { setState('wrong'); return; }
     const p = app.get().pending;
@@ -142,16 +142,16 @@ export function VerifyEmail({ params }: { params: Params }) {
   };
   const resend = () => { setState('idle'); setCode(''); setLeft(42); input.current?.focus(); };
   const bad = state !== 'idle';
-  const active = Math.min(code.length, 5);
+  const active = Math.min(code.length, 4);
 
   return (
     <AuthScreen
-      footer={<Button full disabled={code.length < 6 || state === 'expired'} onClick={verify}>Verify</Button>}
+      footer={<Button full disabled={code.length < 5 || state === 'expired'} onClick={verify}>Verify</Button>}
     >
-      <Header title="Check your email" sub={<>We sent a 6-digit code to <b className="c-secondary" style={{ fontWeight: 600 }}>{email}</b></>} />
+      <Header title="Check your email" sub={<>We sent a 5-digit code to <b className="c-secondary" style={{ fontWeight: 600 }}>{email}</b></>} />
       <div className="row rel" style={{ gap: 8, padding: '8px 0 4px' }} onClick={() => input.current?.focus()}>
-        {Array.from({ length: 6 }).map((_, i) => {
-          const isActive = focus && !bad && i === active && code.length < 6;
+        {Array.from({ length: 5 }).map((_, i) => {
+          const isActive = focus && !bad && i === active && code.length < 5;
           return (
             <div
               key={i}
@@ -171,13 +171,13 @@ export function VerifyEmail({ params }: { params: Params }) {
           autoFocus
           inputMode="numeric"
           autoComplete="one-time-code"
-          maxLength={6}
+          maxLength={5}
           onFocus={() => setFocus(true)}
           onBlur={() => setFocus(false)}
-          onChange={(e) => { setCode(e.target.value.replace(/\D/g, '').slice(0, 6)); if (state === 'wrong') setState('idle'); }}
+          onChange={(e) => { setCode(e.target.value.replace(/\D/g, '').slice(0, 5)); if (state === 'wrong') setState('idle'); }}
           onKeyDown={(e) => { if (e.key === 'Enter') verify(); }}
           style={{ position: 'absolute', inset: 0, opacity: 0, caretColor: 'transparent' }}
-          aria-label="6-digit code"
+          aria-label="5-digit code"
         />
       </div>
       {bad && (
@@ -286,10 +286,10 @@ export function PickGenres() {
     <StepScreen
       step={2}
       title="What do you read?"
-      sub="Pick a few and we’ll show you bookclubs worth joining."
+      sub="Pick at least 3 and we’ll show you bookclubs worth joining."
       skip={() => nav.push('join-clubs')}
       padTop={12}
-      footer={<Button full disabled={sel.length === 0} onClick={next}>{sel.length ? `Continue with ${sel.length}` : 'Continue'}</Button>}
+      footer={<Button full disabled={sel.length < 3} onClick={next}>{sel.length ? `Continue with ${sel.length}` : 'Continue'}</Button>}
     >
       <div className="row" style={{ flexWrap: 'wrap', gap: 8, paddingTop: 8 }}>
         {GENRES.map((g) => <Chip key={g} label={g} on={sel.includes(g)} onClick={() => toggle(g)} />)}
@@ -400,7 +400,7 @@ export function LogIn({ params }: { params: Params }) {
           label="Password" type="password" reveal value={pw} placeholder="Enter your password"
           onChange={(v) => { setPw(v); if (err === 'mismatch') setErr(null); }}
           state={err ? 'error' : 'default'}
-          helper={err === 'mismatch' ? 'That email and password don’t match.' : err === 'locked' ? 'Too many attempts. Wait 5 minutes, or reset your password.' : undefined}
+          helper={err === 'mismatch' ? 'Invalid email or password' : err === 'locked' ? 'Too many attempts. Wait 5 minutes, or reset your password.' : undefined}
           onEnter={submit}
         />
         <button className="t-body-s c-link tr" onClick={() => nav.push('forgot', { email })}>Forgot password?</button>
@@ -439,8 +439,8 @@ export function ForgotPassword({ params }: { params: Params }) {
 export function ResetSent({ params }: { params: Params }) {
   const email = (params.email as string) || EXISTING_EMAIL;
   return (
-    <AuthScreen gap={12} footer={<Button full onClick={() => nav.push('set-password', { email })}>Open email app</Button>}>
-      <Header title="Check your email" sub={`We sent a reset link to ${email}. It expires in an hour.`} />
+    <AuthScreen gap={12}>
+      <Header title="Check your email" sub={`We sent a reset link to ${email}. Open that email and tap the link to set a new password. It expires in an hour.`} />
     </AuthScreen>
   );
 }
