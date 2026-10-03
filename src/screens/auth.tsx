@@ -309,6 +309,8 @@ const STARTER = [
 
 export function JoinBookclubs() {
   const [joined, setJoined] = useState<Record<string, boolean>>(() => Object.fromEntries(STARTER.map((c) => [c.id, c.action === 'joined'])));
+  // The private bookclub's Request button toggles to Requested and back, like Join / Joined.
+  const [requested, setRequested] = useState(false);
   const count = Object.values(joined).filter(Boolean).length;
   // Joining none leads to the empty Home ("Nothing here yet").
   const finish = () => { app.set({ hasClubs: count > 0 }); app.signIn(); };
@@ -328,8 +330,8 @@ export function JoinBookclubs() {
           name={c.name}
           meta={c.meta}
           art={c.art}
-          action={c.action === 'request' ? 'request' : joined[c.id] ? 'joined' : 'join'}
-          onAction={() => (c.action === 'request' ? nav.push('club-preview', { id: 'quill' }) : setJoined((j) => ({ ...j, [c.id]: !j[c.id] })))}
+          action={c.action === 'request' ? (requested ? 'requested' : 'request') : joined[c.id] ? 'joined' : 'join'}
+          onAction={() => (c.action === 'request' ? setRequested((r) => !r) : setJoined((j) => ({ ...j, [c.id]: !j[c.id] })))}
         />
       ))}
     </StepScreen>
@@ -337,7 +339,7 @@ export function JoinBookclubs() {
 }
 
 export function DiscoverRowView({ name, meta, art, palette, action, onAction, onClick }: {
-  name: string; meta: string; art: number; palette?: 'indigo' | 'forest' | 'clay' | 'rose' | 'teal' | 'plum'; action: 'join' | 'request' | 'joined'; onAction?: () => void; onClick?: () => void;
+  name: string; meta: string; art: number; palette?: 'indigo' | 'forest' | 'clay' | 'rose' | 'teal' | 'plum'; action: 'join' | 'request' | 'requested' | 'joined'; onAction?: () => void; onClick?: () => void;
 }) {
   return (
     <div className="row tap" style={{ padding: '12px 0', gap: 12 }} onClick={onClick}>
@@ -349,6 +351,8 @@ export function DiscoverRowView({ name, meta, art, palette, action, onAction, on
       <span onClick={(e) => e.stopPropagation()}>
         {action === 'join' && <Button size="sm" onClick={onAction}>Join</Button>}
         {action === 'request' && <Button size="sm" kind="secondary" onClick={onAction}>Request</Button>}
+        {/* Figma's Discover Row has no "Requested" variant; it borrows the Joined look. */}
+        {action === 'requested' && <Button size="sm" kind="ghost" onClick={onAction}>Requested</Button>}
         {action === 'joined' && <Button size="sm" kind="ghost" onClick={onAction}>Joined</Button>}
       </span>
     </div>
