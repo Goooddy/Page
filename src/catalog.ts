@@ -207,6 +207,7 @@ export const CATALOG: CatalogSection[] = [
       { id: '537:10275', title: 'Invite people (member)', go: S([['bookclubs'], ['chat', { club: 'historical' }], ['invite', { club: 'historical', member: true, emails: EMAILS }]]) },
       { id: '537:10338', title: 'Invite people — sent', go: S([['bookclubs'], ['chat', { club: 'historical' }], ['invite', { club: 'historical', member: true, sent: true }]]), hint: 'Add emails, then Send invitations' },
       { id: '558:13737', title: 'Edit bookclub', go: S([['bookclubs'], ['club-info', { club: 'midnight' }], ['edit-club', { club: 'midnight' }]]) },
+      { id: '558:14225', title: 'Edit bookclub — switching to public', go: S([['bookclubs'], ['club-info', { club: 'midnight' }], ['edit-club', { club: 'midnight', wasPrivate: true }]]), hint: 'Make a private bookclub public' },
       { id: '401:7058', title: 'Closed bookclubs', go: S([['bookclubs'], ['closed-list']]), hint: 'Bookclubs → Closed' },
       { id: '401:7202', title: 'Closed bookclub — admin view', go: S([['bookclubs'], ['closed-list'], ['chat', { club: 'hff' }]]), hint: 'Open a bookclub you closed' },
       { id: '809:27727', title: 'Closed bookclub — member view', go: S([['bookclubs'], ['closed-list'], ['chat', { club: 'hff', closedView: 'member' }]]), hint: 'Open a bookclub its admin closed' },
@@ -216,7 +217,6 @@ export const CATALOG: CatalogSection[] = [
       { id: '809:28251', title: 'Confirm — leave bookclub (member)', go: S([['bookclubs'], ['chat', { club: 'historical' }], ['club-info', { club: 'historical', dialog: 'leave' }]]) },
       { id: '819:13761', title: 'Closed bookclub — new admin, already runs one', go: S([['alerts'], ['chat', { club: 'poetry-sundays', closedView: 'limit-runs' }]], { setup: () => alerts.reset('admin-left') }), hint: 'Tap the “now the admin” alert' },
       { id: '819:13898', title: 'Closed bookclub — new admin, over 10 members', go: S([['alerts'], ['chat', { club: 'poetry-sundays', closedView: 'limit-members' }]], { setup: () => alerts.reset('admin-left') }), hint: 'Same alert, when you don’t run another bookclub' },
-      { id: '558:14225', title: 'Edit bookclub — switching to public', go: S([['bookclubs'], ['club-info', { club: 'midnight' }], ['edit-club', { club: 'midnight', wasPrivate: true }]]), hint: 'Make a private bookclub public' },
     ],
   },
   {
