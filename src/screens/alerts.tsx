@@ -9,6 +9,7 @@ import { Icon } from '../components/Icon';
 import { createStore, useStoreValue } from '../lib/store';
 import { useFirstLoad } from './home';
 import { BookCardView } from './discover';
+import { closedEntry, clubsStore } from '../data/clubs';
 
 type Alert = AlertData & { initials: string; go?: () => void };
 
@@ -32,11 +33,27 @@ const repliesAlerts = (): Alert[] => [
   { id: 'b7', type: 'mention', initials: 'FE', text: 'Femi mentioned you in a thread', meta: 'Clue Seekers · 3 hr ago' },
 ];
 
+// "Alerts — bookclub changes": closing, reopening and admin hand-overs.
+const changesAlerts = (): Alert[] => [
+  { id: 'c1', type: 'moderation', icon: 'ChatCircleSlash', unread: true, initials: '', text: 'The admin closed Historical Fiction Fans. You can still read past messages.', meta: 'Historical Fiction Fans · 5 min ago' },
+  { id: 'c2', type: 'moderation', icon: 'ArrowClockwise', unread: true, initials: '', text: 'Midnight Readers Club is open again.', meta: 'Midnight Readers Club · 1 hr ago' },
+  { id: 'c3', type: 'moderation', icon: 'CrownSimple', unread: true, initials: '', text: 'You’re now the admin of The Quill Society. Joseph234 left the bookclub.', meta: 'The Quill Society · 2 hr ago' },
+  { id: 'c4', type: 'moderation', icon: 'CrownSimple', initials: '', text: 'Amaka is now the admin of Clue Seekers.', meta: 'Clue Seekers · Yesterday' },
+  { id: 'c5', type: 'moderation', icon: 'XCircle', initials: '', text: 'Your request to join The Bible Readers was cancelled because the bookclub was closed.', meta: 'The Bible Readers · 2 days ago' },
+  { id: 'c6', type: 'moderation', icon: 'XCircle', initials: '', text: 'Your invitation to Sci-Fi Saturdays was cancelled because the bookclub was closed.', meta: 'Sci-Fi Saturdays · 3 days ago' },
+];
+// "Alerts — admin left, bookclub closed"
+const adminLeftAlerts = (): Alert[] => [
+  { id: 'd1', type: 'moderation', icon: 'CrownSimple', unread: true, initials: '', text: 'You’re now the admin of Poetry on Sundays. It’s closed for now because it’s over your plan’s limits.', meta: 'Poetry on Sundays · 10 min ago' },
+  { id: 'd2', type: 'moderation', icon: 'ChatCircleSlash', unread: true, initials: '', text: 'Poetry on Sundays was closed when its admin left. Amaka is the new admin and can reopen it.', meta: 'Poetry on Sundays · 10 min ago' },
+];
+const VARIANTS = { replies: repliesAlerts, changes: changesAlerts, 'admin-left': adminLeftAlerts };
+
 export const alertsStore = createStore<{ list: Alert[]; invitation: 'open' | 'accepted' | 'declined' }>({ list: seedAlerts(), invitation: 'open' });
 const useAlerts = <R,>(sel: (s: { list: Alert[]; invitation: 'open' | 'accepted' | 'declined' }) => R) => useStoreValue(alertsStore, sel);
 const syncBadge = () => app.set({ alertsBadge: alertsStore.get().list.filter((a) => a.unread).length });
 export const alerts = {
-  reset(variant?: 'replies') { alertsStore.set({ list: variant === 'replies' ? repliesAlerts() : seedAlerts(), invitation: 'open' }); syncBadge(); },
+  reset(variant?: keyof typeof VARIANTS) { alertsStore.set({ list: variant ? VARIANTS[variant]() : seedAlerts(), invitation: 'open' }); syncBadge(); },
   read(id: string) { alertsStore.set((s) => ({ list: s.list.map((a) => (a.id === id ? { ...a, unread: false } : a)) })); syncBadge(); },
   readAll() { alertsStore.set((s) => ({ list: s.list.map((a) => ({ ...a, unread: false })) })); syncBadge(); },
   patch(id: string, p: Partial<Alert>) { alertsStore.set((s) => ({ list: s.list.map((a) => (a.id === id ? { ...a, ...p } : a)) })); syncBadge(); },
@@ -48,6 +65,14 @@ export const alerts = {
 function open(a: Alert) {
   alerts.read(a.id);
   if (a.type === 'invitation') return nav.push('invitation');
+  if (a.id === 'c1') return nav.push('chat', { club: 'hff', closedView: 'member' });
+  if (a.id === 'c2') return nav.push('chat', { club: 'midnight' });
+  if (a.id === 'c3') return nav.push('chat', { club: 'quill' });
+  if (a.id === 'c4') return nav.push('chat', { club: 'clue' });
+  if (a.id === 'c5' || a.id === 'c6') return;
+  // You still run Midnight Readers Club → the "already runs one" variant; otherwise the member-limit one.
+  if (a.id === 'd1') { const st = clubsStore.get(); return nav.push('chat', { club: 'poetry-sundays', closedView: !st.left.midnight && !closedEntry('midnight', st) ? 'limit-runs' : 'limit-members' }); }
+  if (a.id === 'd2') return nav.push('chat', { club: 'poetry-sundays', closedView: 'member' });
   if (a.type === 'moderation') return nav.push('moderation', { kind: 'content' });
   if (a.id === 'a1' || a.id === 'b1' || a.id === 'b6') return nav.push('thread', { club: 'midnight', cold: true });
   if (a.id === 'a3') return nav.push('chat', { club: 'quill' });
@@ -178,9 +203,9 @@ export function ModerationReason({ params }: { params: Params }) {
           {content ? (
             <Rule title="External links aren’t allowed" body="Page234 doesn’t permit links to other websites. This keeps conversations on the platform and protects against spam." />
           ) : (
-            <Rule title="Repeated off-topic posting" body="The owner of a bookclub can remove members from their own room. Page234 administrators were not involved." />
+            <Rule title="Repeated off-topic posting" body="The admin of a bookclub can remove members from their own room. The Page234 team was not involved." />
           )}
-          <SettingsRow label="Removed by" value="The bookclub owner" chevron={false} />
+          <SettingsRow label="Removed by" value="The bookclub admin" chevron={false} />
           {content ? <SettingsRow label="Your account" value="In good standing" chevron={false} /> : <SettingsRow label="Can you rejoin?" value="Yes, it’s public" chevron={false} />}
           <div style={{ paddingTop: 20 }}>
             {content ? (

@@ -64,7 +64,7 @@ export function CreateClub({ params }: { params: Params }) {
   const create = () => {
     const title = manual ? manualBook.title.trim() : book!.title;
     const id = `new-${created + 1}`;
-    const c: Club = { id, name: name.trim(), art, palette: paletteFor(art), sub: `${title} · 1 member`, isPrivate: !pub, role: 'owner', row: { time: 'now', preview: 'Your bookclub is ready' } };
+    const c: Club = { id, name: name.trim(), art, palette: paletteFor(art), sub: `${title} · 1 member`, isPrivate: !pub, role: 'admin', row: { time: 'now', preview: 'Your bookclub is ready' } };
     clubs.create(c);
     chat.seed(id, [{ id: 'today', divider: 'date', label: 'Today' }]);
     app.set({ hasClubs: true });

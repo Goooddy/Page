@@ -5,7 +5,7 @@ import {
   SignUp, VerifyEmail, ChooseUsername, PickGenres, JoinBookclubs, LogIn, ForgotPassword, ResetSent, ResetExpired, SetNewPassword,
 } from './auth';
 import { Home } from './home';
-import { Bookclubs } from './bookclubs';
+import { Bookclubs, ClosedBookclubs } from './bookclubs';
 import { Chat } from './chat';
 import { Thread } from './thread';
 import { Discover, Search, ClubPreview, Channels } from './discover';
@@ -34,6 +34,7 @@ export const SCREENS: Record<string, ComponentType<{ params: Params }>> = {
   'set-password': SetNewPassword,
   home: Home,
   bookclubs: Bookclubs,
+  'closed-list': ClosedBookclubs,
   chat: Chat,
   thread: Thread,
   discover: Discover,

@@ -139,7 +139,7 @@ export function PendingRequests() {
       <AppBar title="Pending requests" />
       <div className="screen-body">
         <div className="col" style={{ padding: '16px 16px 24px' }}>
-          <p className="t-body-s c-tertiary" style={{ paddingBottom: 12 }}>Owners decide who joins a private bookclub. You’ll get an alert the moment one says yes.</p>
+          <p className="t-body-s c-tertiary" style={{ paddingBottom: 12 }}>Admins decide who joins a private bookclub. You’ll get an alert the moment one says yes.</p>
           <Row art={1} name="The Bible Readers" meta="Asked 2 days ago" right={<StatusPill kind="neutral" label="Waiting" />} />
           <Row art={2} name="Environmental Advocates" meta="Asked last week" right={<StatusPill kind="neutral" label="Waiting" />} />
           <Row art={3} name="Private Poetry Circle" meta={asked ? 'Asked just now' : 'Not accepted · 4 days ago'} right={asked ? <StatusPill kind="neutral" label="Waiting" /> : <Button size="sm" kind="ghost" onClick={() => setAsked(true)}>Ask again</Button>} />
@@ -378,11 +378,11 @@ function DocScreen({ title, intro, sections }: { title: string; intro: string; s
 }
 
 export const ContentRules = () => (
-  <DocScreen title="Content rules" intro="Page234 is a place to talk about books. These rules exist so that stays true. A bookclub owner moderates their own room; Page234 administrators handle the platform." sections={[
+  <DocScreen title="Content rules" intro="Page234 is a place to talk about books. These rules exist so that stays true. Each bookclub’s admin looks after their own room; the Page234 team looks after the platform." sections={[
     ['No links to other websites', 'Links off Page234 aren’t permitted. It keeps conversations here and keeps spam out. Naming a book, an author or a publisher is fine — linking to them is not.'],
     ['No pirated or copyrighted material', 'Don’t share copies of books, scans, or where to download them. Page234 doesn’t host books and won’t point at anyone who does.'],
     ['No spam or advertising', 'Don’t promote products, services or your own channels in a room you joined to read.'],
-    ['No harassment or abuse', 'Disagree with the book, the reading, or each other. Don’t attack the person. Owners can remove members from their own rooms; repeated abuse ends the account.'],
+    ['No harassment or abuse', 'Disagree with the book, the reading, or each other. Don’t attack the person. Admins can remove members from their own rooms; repeated abuse ends the account.'],
     ['Spoilers', 'Say where you are before you say what you think. A chapter number at the top of a message costs nothing.'],
     ['What happens when a rule is broken', 'The message is removed and you’re told which rule and who acted. Your account standing is shown on that notice. Nothing is removed silently.'],
   ]} />
@@ -391,9 +391,9 @@ export const ContentRules = () => (
 export const Terms = () => (
   <DocScreen title="Terms of service" intro="Plain-language summary of each section sits first; the binding text underneath is supplied by Legal and is not drafted here." sections={[
     ['Your account', 'You need an account to read or post. One person, one account. You’re responsible for what’s posted from it. You must be old enough to hold an account where you live.'],
-    ['What you post', 'You keep ownership of what you write. You give Page234 permission to show it inside the app to the people who can see that bookclub. You can delete your messages and your account.'],
+    ['What you post', 'You keep ownership of what you write. You give Page234 permission to show it inside the app to the people who can see that bookclub. You can delete your messages while a bookclub is open, and you can delete your account at any time.'],
     ['What we don’t host', 'Page234 does not host, sell or distribute books. A bookclub names what it is reading; that is all.'],
-    ['Bookclubs and moderation', 'A bookclub owner sets who joins their room and can remove members from it. Page234 administrators can remove content or accounts that break the content rules.'],
+    ['Bookclubs and moderation', 'A bookclub’s admin decides who joins and can remove members. The admin can close the bookclub, which makes it read-only for everyone until they reopen it. If the admin leaves, the role passes to another member; a bookclub is deleted when its last member leaves. The Page234 team can remove content or accounts that break the content rules.'],
     ['Premium', 'Premium is billed through the App Store or Play Store and renews every 30 days until cancelled. Cancel in your store account. Refunds follow the store’s policy, not ours.'],
     ['Ending your account', 'You can delete your account at any time from Account settings. We may close an account that repeatedly breaks the content rules.'],
     ['Changes to these terms', 'If these terms change in a way that affects you, you’ll be told in the app before the change takes effect.'],
@@ -412,7 +412,7 @@ export const Privacy = () => (
 );
 
 /* ——— Contact support ——— */
-const TOPICS = ['Billing and payments', 'A bookclub or its owner', 'Someone’s behaviour', 'Something is broken', 'Account and sign-in', 'Something else'];
+const TOPICS = ['Billing and payments', 'A bookclub or its admin', 'Someone’s behaviour', 'Something is broken', 'Account and sign-in', 'Something else'];
 export function ContactSupport({ params }: { params: Params }) {
   const email = useApp((s) => s.user.email);
   const [topic, setTopic] = useState((params.topic as string) ?? '');
@@ -429,7 +429,7 @@ export function ContactSupport({ params }: { params: Params }) {
       <div className="screen-body">
         <div className="col" style={{ padding: '16px 16px 24px', gap: 12 }}>
           <p className="t-body-s c-tertiary">Tell us what happened and we’ll come back to you by email, usually within two working days.</p>
-          <SelectField label="What’s this about?" value={topic} placeholder="Choose a topic" helper="Billing · A bookclub · Behaviour · Something broken · Account · Other" onClick={() => setPicker(true)} />
+          <SelectField label="What’s this about?" value={topic} placeholder="Choose a topic" helper="Billing · A bookclub · A person · Something broken · Other" onClick={() => setPicker(true)} />
           <TextArea label="What happened?" value={text} onChange={setText} placeholder="Describe the problem…" helper="Include the bookclub name if it helps." max={600} />
           <TextField label="Reply to" type="email" value={reply} onChange={setReply} helper="We’ll answer here." />
         </div>

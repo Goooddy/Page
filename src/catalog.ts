@@ -62,7 +62,7 @@ const REPLIES = [
 ];
 const SENDING = { id: 'rs', name: 'Sidi', you: true, time: '2:14 PM', body: 'That rosary reading hadn’t occurred to me — it reframes the whole second half.', likes: 0, state: 'sending' as const };
 const newClub = () => {
-  const c: Club = { id: 'new-1', name: 'Midnight Readers Club', art: 17, palette: 'clay', sub: 'The Journey to my Village · 1 member', role: 'owner', row: { time: 'now', preview: 'Your bookclub is ready' } };
+  const c: Club = { id: 'new-1', name: 'Midnight Readers Club', art: 17, palette: 'clay', sub: 'The Journey to my Village · 1 member', role: 'admin', row: { time: 'now', preview: 'Your bookclub is ready' } };
   clubs.create(c);
   chat.seed('new-1', [{ id: 'today', divider: 'date', label: 'Today' }]);
 };
@@ -92,6 +92,7 @@ export const CATALOG: CatalogSection[] = [
       { id: '495:6894', title: 'Verify email — code expired', go: signedOut([['onboarding'], ['signup'], ['verify', { email: 'samuel@example.com', code: '47291', state: 'expired' }]]), hint: 'Verify after the resend timer runs out' },
       { id: '352:1883', title: 'Choose username', go: signedOut([['onboarding'], ['signup'], ['username']]) },
       { id: '350:2357', title: 'Pick genres', go: signedOut([['onboarding'], ['signup'], ['username'], ['genres']]) },
+      { id: '741:13248', title: 'Pick genres — fewer than 3', go: signedOut([['onboarding'], ['signup'], ['username'], ['genres', { sel: ['Fiction'] }]]), hint: 'Pick fewer than 3 genres' },
       { id: '373:3834', title: 'Join bookclubs', go: signedOut([['onboarding'], ['signup'], ['username'], ['genres'], ['join-clubs']]) },
       { id: '352:1948', title: 'Notification priming', go: S(TH({ priming: true, sending: true })), hint: 'Shown after your first reply in a thread' },
     ],
@@ -180,9 +181,9 @@ export const CATALOG: CatalogSection[] = [
       { id: '537:9087', title: 'Chat — mute options', go: S([['bookclubs'], ['chat', { club: 'midnight', sheet: 'mute' }]]) },
       { id: '537:9144', title: 'Chat — muted', go: S([['bookclubs'], ['chat', { club: 'midnight', toast: 'muted' }]], { setup: () => clubs.mute('midnight', 'For 8 hours') }) },
       { id: '537:9213', title: 'Chat — bookclub menu (muted)', go: S([['bookclubs'], ['chat', { club: 'midnight', menu: true }]], { setup: () => clubs.mute('midnight', 'For 8 hours') }) },
-      { id: '557:12791', title: 'Chat — select mode, owner on someone else’s message', go: S([['bookclubs'], ['chat', { club: 'midnight', select: ['m1'] }]]), hint: 'In a bookclub you own' },
-      { id: '557:12987', title: 'Chat — owner removing a message (reason)', go: S([['bookclubs'], ['chat', { club: 'midnight', select: ['m1'], sheet: 'remove' }]]) },
-      { id: '557:13210', title: 'Chat — message removed by owner', go: S([['bookclubs'], ['chat', { club: 'midnight', toast: 'removed' }]], { setup: seed('midnight', [D1, { ...M1, state: 'removed', replies: 0 }, M2, M3, DU, M4]) }) },
+      { id: '557:12791', title: 'Chat — select mode, admin on someone else’s message', go: S([['bookclubs'], ['chat', { club: 'midnight', select: ['m1'] }]]), hint: 'In a bookclub you run' },
+      { id: '557:12987', title: 'Chat — admin removing a message (reason)', go: S([['bookclubs'], ['chat', { club: 'midnight', select: ['m1'], sheet: 'remove' }]]) },
+      { id: '557:13210', title: 'Chat — message removed by admin', go: S([['bookclubs'], ['chat', { club: 'midnight', toast: 'removed' }]], { setup: seed('midnight', [D1, { ...M1, state: 'removed', replies: 0 }, M2, M3, DU, M4]) }) },
       { id: '261:1628', title: 'Thread', go: S(TH({ sending: true })) },
       { id: '561:14735', title: 'Thread — loading', go: S(TH({ loading: true })) },
       { id: '401:6654', title: 'Thread — no replies yet', go: S(TH({ empty: true })) },
@@ -197,15 +198,24 @@ export const CATALOG: CatalogSection[] = [
       { id: '533:9160', title: 'Thread — reply edited', go: S(TH(), { setup: () => chat.seedReplies('midnight:m1', [REPLIES[0], REPLIES[1], { ...REPLIES[2], body: '@Tobi that rosary reading hadn’t occurred to me — it reframes the ending too.', edited: true }, SENDING]) }) },
       { id: '401:5212', title: 'Confirm — delete reply', go: S(TH({ sending: true, dialog: true })) },
       { id: '358:3488', title: 'Bookclub information', go: S([['bookclubs'], ['chat', { club: 'midnight' }], ['club-info', { club: 'midnight' }]]), hint: 'Chat menu → Bookclub information' },
-      { id: '558:13626', title: 'Bookclub information — member view', go: S([['bookclubs'], ['chat', { club: 'historical' }], ['club-info', { club: 'historical' }]]), hint: 'In a bookclub you don’t own' },
-      { id: '401:5130', title: 'Confirm — leave bookclub', go: S([['bookclubs'], ['chat', { club: 'midnight' }], ['club-info', { club: 'midnight', dialog: 'leave' }]]) },
+      { id: '558:13626', title: 'Bookclub information — member view', go: S([['bookclubs'], ['chat', { club: 'historical' }], ['club-info', { club: 'historical' }]]), hint: 'In a bookclub you don’t run' },
+      { id: '401:5130', title: 'Confirm — leave bookclub (admin)', go: S([['bookclubs'], ['chat', { club: 'midnight' }], ['club-info', { club: 'midnight', dialog: 'leave' }]]) },
       { id: '344:2139', title: 'Manage members', go: S([['bookclubs'], ['club-info', { club: 'midnight' }], ['members']]) },
       { id: '373:4600', title: 'Member search', go: S([['bookclubs'], ['club-info', { club: 'midnight' }], ['members'], ['member-search', { q: 'ade' }]]) },
       { id: '401:5242', title: 'Confirm — remove member', go: S([['bookclubs'], ['club-info', { club: 'midnight' }], ['members', { remove: 'hcao' }]]), hint: 'Tap ••• on a member' },
-      { id: '537:10224', title: 'Invite people (owner)', go: S([['bookclubs'], ['chat', { club: 'midnight' }], ['invite', { club: 'midnight', emails: EMAILS }]]) },
+      { id: '537:10224', title: 'Invite people (admin)', go: S([['bookclubs'], ['chat', { club: 'midnight' }], ['invite', { club: 'midnight', emails: EMAILS }]]) },
       { id: '537:10275', title: 'Invite people (member)', go: S([['bookclubs'], ['chat', { club: 'historical' }], ['invite', { club: 'historical', member: true, emails: EMAILS }]]) },
       { id: '537:10338', title: 'Invite people — sent', go: S([['bookclubs'], ['chat', { club: 'historical' }], ['invite', { club: 'historical', member: true, sent: true }]]), hint: 'Add emails, then Send invitations' },
       { id: '558:13737', title: 'Edit bookclub', go: S([['bookclubs'], ['club-info', { club: 'midnight' }], ['edit-club', { club: 'midnight' }]]) },
+      { id: '401:7058', title: 'Closed bookclubs', go: S([['bookclubs'], ['closed-list']]), hint: 'Bookclubs → Closed' },
+      { id: '401:7202', title: 'Closed bookclub — admin view', go: S([['bookclubs'], ['closed-list'], ['chat', { club: 'hff' }]]), hint: 'Open a bookclub you closed' },
+      { id: '809:27727', title: 'Closed bookclub — member view', go: S([['bookclubs'], ['closed-list'], ['chat', { club: 'hff', closedView: 'member' }]]), hint: 'Open a bookclub its admin closed' },
+      { id: '809:27893', title: 'Confirm — close bookclub', go: S([['bookclubs'], ['chat', { club: 'midnight' }], ['club-info', { club: 'midnight', dialog: 'close' }]]), hint: 'Bookclub info → Close bookclub' },
+      { id: '809:27943', title: 'Bookclub reopened', go: S([['bookclubs'], ['chat', { club: 'midnight', toast: 'reopened' }]]), hint: 'Tap Reopen bookclub' },
+      { id: '809:28125', title: 'Confirm — leave bookclub (last member)', go: S([['bookclubs'], ['chat', { club: 'new-1' }], ['club-info', { club: 'new-1', dialog: 'leave' }]], { setup: newClub }), hint: 'Leave a bookclub you just created' },
+      { id: '809:28251', title: 'Confirm — leave bookclub (member)', go: S([['bookclubs'], ['chat', { club: 'historical' }], ['club-info', { club: 'historical', dialog: 'leave' }]]) },
+      { id: '819:13761', title: 'Closed bookclub — new admin, already runs one', go: S([['alerts'], ['chat', { club: 'poetry-sundays', closedView: 'limit-runs' }]], { setup: () => alerts.reset('admin-left') }), hint: 'Tap the “now the admin” alert' },
+      { id: '819:13898', title: 'Closed bookclub — new admin, over 10 members', go: S([['alerts'], ['chat', { club: 'poetry-sundays', closedView: 'limit-members' }]], { setup: () => alerts.reset('admin-left') }), hint: 'Same alert, when you don’t run another bookclub' },
       { id: '558:14225', title: 'Edit bookclub — switching to public', go: S([['bookclubs'], ['club-info', { club: 'midnight' }], ['edit-club', { club: 'midnight', wasPrivate: true }]]), hint: 'Make a private bookclub public' },
     ],
   },
@@ -229,6 +239,8 @@ export const CATALOG: CatalogSection[] = [
       { id: '391:6901', title: 'Alerts — loading', go: S([['alerts', { loading: true }]]) },
       { id: '401:6253', title: 'Alerts — empty', go: S([['alerts']], { setup: () => { alertsStore.set({ list: [] }); app.set({ alertsBadge: 0 }); } }) },
       { id: '529:9036', title: 'Alerts — replies and mentions', go: S([['alerts']], { setup: () => alerts.reset('replies') }) },
+      { id: '809:32696', title: 'Alerts — bookclub changes', go: S([['alerts']], { setup: () => alerts.reset('changes') }) },
+      { id: '819:14032', title: 'Alerts — admin left, bookclub closed', go: S([['alerts']], { setup: () => alerts.reset('admin-left') }) },
       { id: '561:16145', title: 'Alerts — offline', go: S([['alerts']], { offline: true }) },
       { id: '344:1771', title: 'Invitation received', go: S([['alerts'], ['invitation']]), hint: 'Tap the invitation alert' },
       { id: '401:6999', title: 'Invitation received — no longer available', go: S([['alerts'], ['invitation', { gone: true }]]), hint: 'Open an invitation you already answered' },

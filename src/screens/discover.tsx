@@ -206,7 +206,7 @@ export function ClubPreview({ params }: { params: Params }) {
             <span className="t-caption c-tertiary tc fill">{p.meta}</span>
             <p className="t-body-s c-tertiary fill">{p.about}</p>
             <BookCardView title={p.book} author={p.author} />
-            <MemberRow name="Joseph234" initials="JO" type="owner" />
+            <MemberRow name="Joseph234" initials="JO" type="admin" />
             {kind === 'public' ? (
               <>
                 <span className="t-label c-secondary fill">Recent conversation</span>
@@ -217,7 +217,7 @@ export function ClubPreview({ params }: { params: Params }) {
               </>
             ) : (
               <div className="fill" style={{ padding: 12, background: 'var(--surface-canvas)', borderRadius: 8 }}>
-                <p className="t-body-s c-tertiary">You’ll be able to read the conversation once the owner approves you.</p>
+                <p className="t-body-s c-tertiary">You’ll be able to read the conversation once the admin approves you.</p>
               </div>
             )}
           </div>

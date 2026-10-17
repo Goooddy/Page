@@ -7,7 +7,7 @@ import { SearchField, SelectField, TextArea, TextField } from '../components/ui/
 import { AvatarPickerCell, Hairline, MemberRow, PreferenceRow, SelectedBook, SettingsRow } from '../components/ui/rows';
 import { Dialog, MenuRow, Sheet, SheetTitle } from '../components/ui/overlays';
 import { Icon } from '../components/Icon';
-import { clubById, clubs, useClubs } from '../data/clubs';
+import { clubById, closedEntry, clubs, leaveCopy, useClubs } from '../data/clubs';
 import { ReasonSheet, ReportFormSheet } from './chat';
 import { GenreSheet } from './create';
 
@@ -18,10 +18,13 @@ export const paletteFor = (art: number) => PICKER_PALETTES[(art - 1) % 6];
 export function ClubInfo({ params }: { params: Params }) {
   const clubId = (params.club as string) ?? 'midnight';
   const club = clubById(clubId);
-  const owner = params.member ? false : club.role === 'owner';
+  const closed = useClubs((s) => closedEntry(clubId, s));
+  const admin = params.member ? false : club.role === 'admin' || closed?.by === 'you';
+  // A bookclub you just created has one member ("Confirm — leave bookclub (last member)").
+  const last = clubId.startsWith('new-');
   const muted = useClubs((s) => s.muted[clubId]);
   const [showInSearch, setShowInSearch] = useState(true);
-  const [dialog, setDialog] = useState<null | 'leave' | 'remove'>((params.dialog as never) ?? null);
+  const [dialog, setDialog] = useState<null | 'leave' | 'remove' | 'close'>((params.dialog as never) ?? null);
   const [removing, setRemoving] = useState('hcao');
   const [sheet, setSheet] = useState<null | 'mute' | 'report' | 'report-else'>(null);
   const reported = () => { setSheet(null); app.toast('Reported. We’ll review this.', 'success', { bottom: 46 }); };
@@ -38,11 +41,11 @@ export function ClubInfo({ params }: { params: Params }) {
               </span>
             </span>
             <span className="t-title-s c-secondary tc">{club.name}</span>
-            <span className="t-caption c-tertiary tc">{club.isPrivate ? 'Private' : 'Public'} · 206 members</span>
+            <span className="t-caption c-tertiary tc">{club.isPrivate ? 'Private' : 'Public'} · {last ? '1 member' : '206 members'}</span>
           </div>
           <p className="t-body-s c-tertiary tc">A slow read of one book at a time. Chapters, not spoilers — say where you are before you say what you think.</p>
           <div className="row" style={{ padding: '16px 0', gap: 8 }}>
-            <span className="grow" style={{ display: 'flex' }}><Button full size="sm" kind="secondary" onClick={() => nav.modal('invite', { club: clubId, member: !owner })}>Invite</Button></span>
+            <span className="grow" style={{ display: 'flex' }}><Button full size="sm" kind="secondary" onClick={() => nav.modal('invite', { club: clubId, member: !admin })}>Invite</Button></span>
             <span className="grow" style={{ display: 'flex' }}><Button full size="sm" kind="secondary" onClick={() => navigator.clipboard?.writeText('page234.com/r/midnight-readers-37488').catch(() => {})}>Share</Button></span>
             <span className="grow" style={{ display: 'flex' }}><Button full size="sm" kind="secondary" onClick={() => (muted ? clubs.unmute(clubId) : setSheet('mute'))}>{muted ? 'Unmute' : 'Mute'}</Button></span>
           </div>
@@ -51,17 +54,21 @@ export function ClubInfo({ params }: { params: Params }) {
             <span className="t-label c-secondary">The Journey to my Village</span>
             <span className="t-caption c-tertiary">Smith White · Fiction</span>
           </div>
-          <SectionHeader title="Members" link="See all 206" onLink={owner ? () => nav.push('members', { club: clubId }) : undefined} />
-          <MemberRow name="Joseph234" initials="JO" type="owner" />
-          <MemberRow name="hcao" initials="HC" onMore={owner ? () => { setRemoving('hcao'); setDialog('remove'); } : undefined} />
-          <MemberRow name="lebatramkol" initials="LB" onMore={owner ? () => { setRemoving('lebatramkol'); setDialog('remove'); } : undefined} />
-          {owner && (
+          <SectionHeader title="Members" link={last ? undefined : 'See all 206'} onLink={admin ? () => nav.push('members', { club: clubId }) : undefined} />
+          <MemberRow name="Joseph234" initials="JO" type="admin" />
+          {!last && (
+            <>
+              <MemberRow name="hcao" initials="HC" onMore={admin ? () => { setRemoving('hcao'); setDialog('remove'); } : undefined} />
+              <MemberRow name="lebatramkol" initials="LB" onMore={admin ? () => { setRemoving('lebatramkol'); setDialog('remove'); } : undefined} />
+            </>
+          )}
+          {admin && (
             <>
               <Hairline />
               <SettingsRow label="Edit bookclub" onClick={() => nav.modal('edit-club', { club: clubId })} />
               <SettingsRow label="Manage members" onClick={() => nav.push('members', { club: clubId })} />
-              <SettingsRow label="Archive bookclub" />
-              <PreferenceRow label="Show in search and recommendations" desc="Owner only" on={showInSearch} onChange={setShowInSearch} />
+              {!closed && <SettingsRow label="Close bookclub" onClick={() => setDialog('close')} />}
+              <PreferenceRow label="Show in search and recommendations" desc="Admin only" on={showInSearch} onChange={setShowInSearch} />
             </>
           )}
           <Hairline />
@@ -73,8 +80,12 @@ export function ClubInfo({ params }: { params: Params }) {
       {sheet === 'report' && <ReasonSheet title="Why are you reporting this?" subtitle="Only Page234 moderators will see this report." action="Submit report" onClose={() => setSheet(null)} onElse={() => setSheet('report-else')} onSubmit={reported} />}
       {sheet === 'report-else' && <ReportFormSheet onClose={() => setSheet(null)} onSubmit={reported} />}
       {dialog === 'leave' && (
-        <Dialog title="Leave this bookclub?" body={`You’ll stop receiving alerts from ${club.name}. You can rejoin any time.`} confirm="Leave"
+        <Dialog {...leaveCopy(clubId, club.name, admin)}
           onCancel={() => setDialog(null)} onConfirm={() => { clubs.leave(clubId); setDialog(null); app.goTab('bookclubs'); }} />
+      )}
+      {dialog === 'close' && (
+        <Dialog title="Close this bookclub?" body="Members can still read past messages, but no one can post until you reopen it. Pending requests and invites will be cancelled, and everyone will be told." confirm="Close"
+          onCancel={() => setDialog(null)} onConfirm={() => { clubs.close(clubId); setDialog(null); nav.pop(); }} />
       )}
       {dialog === 'remove' && (
         <Dialog title={`Remove ${removing}?`} body="They’ll lose access to this bookclub and will be told they were removed." confirm="Remove"
@@ -102,13 +113,13 @@ export function MuteSheet({ clubId, name, onClose }: { clubId: string; name: str
 }
 
 /* ——— Manage members / member search ——— */
-type Person = { name: string; initials: string; type: 'member' | 'owner' | 'request'; meta?: string };
+type Person = { name: string; initials: string; type: 'member' | 'admin' | 'request'; meta?: string };
 const REQUESTS: Person[] = [
   { name: 'kemi_reads', initials: 'K', type: 'request', meta: 'Requested 2 hours ago' },
   { name: 'bookish_ade', initials: 'B', type: 'request', meta: 'Requested yesterday' },
 ];
 const MEMBERS: Person[] = [
-  { name: 'Joseph234', initials: 'J', type: 'owner' },
+  { name: 'Joseph234', initials: 'J', type: 'admin' },
   { name: 'hcao', initials: 'H', type: 'member' },
   { name: 'lebatramkol', initials: 'L', type: 'member' },
   { name: 'amaka', initials: 'A', type: 'member' },
@@ -214,7 +225,7 @@ export function InviteBlock({ owner, emails, setEmails, onSent, intro }: {
 
 export function InvitePeople({ params }: { params: Params }) {
   const club = clubById((params.club as string) ?? 'midnight');
-  const owner = params.member ? false : club.role === 'owner';
+  const owner = params.member ? false : club.role === 'admin';
   const [emails, setEmails] = useState<string[]>((params.emails as string[]) ?? []);
   useEffect(() => { if (params.sent) app.toast('Invitations sent to 2 people', 'success', { bottom: 50 }); }, [params.sent]);
   return (

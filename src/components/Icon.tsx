@@ -8,7 +8,7 @@ import {
   SignOutIcon, ArchiveIcon, LinkSimpleIcon, EnvelopeSimpleIcon, CalendarBlankIcon, CalendarPlusIcon, BellSlashIcon,
   BookOpenIcon, BookmarkSimpleIcon, MegaphoneIcon, CrownSimpleIcon, CreditCardIcon, PencilSimpleIcon, InfoIcon,
   CameraIcon, EyeIcon, EyeSlashIcon, CheckIcon, CheckCircleIcon, XCircleIcon, WarningCircleIcon, WifiSlashIcon,
-  CircleNotchIcon, SmileyBlankIcon, CopyIcon, BroadcastIcon,
+  CircleNotchIcon, SmileyBlankIcon, CopyIcon, BroadcastIcon, ChatCircleSlashIcon,
 } from '@phosphor-icons/react';
 
 // The Figma Icons page uses the Phosphor set (Regular / Bold / Fill). Names match Figma's "Icon/<Name>".
@@ -27,7 +27,7 @@ const ICONS = {
   CrownSimple: CrownSimpleIcon, CreditCard: CreditCardIcon, PencilSimple: PencilSimpleIcon, Info: InfoIcon,
   Camera: CameraIcon, Eye: EyeIcon, EyeSlash: EyeSlashIcon, Check: CheckIcon, CheckCircle: CheckCircleIcon,
   XCircle: XCircleIcon, WarningCircle: WarningCircleIcon, WifiSlash: WifiSlashIcon, CircleNotch: CircleNotchIcon,
-  SmileyBlank: SmileyBlankIcon, Copy: CopyIcon, Broadcast: BroadcastIcon,
+  SmileyBlank: SmileyBlankIcon, Copy: CopyIcon, Broadcast: BroadcastIcon, ChatCircleSlash: ChatCircleSlashIcon,
 } as const;
 
 export type IconName = keyof typeof ICONS;

@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { nav, type Params } from '../lib/nav';
 import { app, useApp } from '../data/app';
 import { chat, chatStore, getChat, useChat } from '../data/chat';
-import { clubById, clubs, useClubs } from '../data/clubs';
+import { clubById, closedEntry, clubs, leaveCopy, useClubs } from '../data/clubs';
 import {
   CatchUpStrip, JumpToLatest, Message, ReactionRow, SelectRow, SelectionBar, ThreadHeader, isMsg,
   type ChatItem, type ChatMsg, type SelAction,
@@ -23,6 +23,25 @@ export const REASONS = ['Spam or advertising', 'Harassment or abuse', 'Pirated o
 export function mentionQuery(text: string) {
   const m = text.match(/(^|\s)@(\w*)$/);
   return m ? m[2].toLowerCase() : null;
+}
+
+/* ——— Closed bookclub footer (replaces the message box) ——— */
+const CLOSED_COPY = {
+  admin: 'You closed this bookclub. Members can still read it. Reopen it to start talking again.',
+  member: 'The admin closed this bookclub. You can still read past messages.',
+  'limit-runs': 'Joseph234 left, so you’re now the admin. Your plan covers one bookclub you run, so this one is closed for now. Upgrade, or close your other bookclub, to reopen it.',
+  'limit-members': 'Joseph234 left, so you’re now the admin. Free plans cover bookclubs of up to 10 members and this one has 48, so it’s closed for now. Upgrade to reopen it.',
+};
+export type ClosedView = keyof typeof CLOSED_COPY;
+
+function ClosedFooter({ view, onReopen }: { view: ClosedView; onReopen: () => void }) {
+  return (
+    <div className="col" style={{ padding: '12px 16px max(32px, env(safe-area-inset-bottom, 0px))', gap: 8, background: 'var(--surface-default)', borderTop: '1px solid var(--border-subtle)', flexShrink: 0, position: 'relative', zIndex: 5 }}>
+      <p className="t-caption c-tertiary tc">{CLOSED_COPY[view]}</p>
+      {view === 'admin' && <Button full onClick={onReopen}>Reopen bookclub</Button>}
+      {(view === 'limit-runs' || view === 'limit-members') && <Button full onClick={() => nav.push('plans')}>Upgrade</Button>}
+    </div>
+  );
 }
 
 /* ——— Report / remove sheets (shared by Chat and Thread) ——— */
@@ -68,8 +87,13 @@ export function Chat({ params }: { params: Params }) {
   const items = useChat((s) => s.chats[clubId]) ?? seed;
   const catchupHidden = useChat((s) => !!s.catchupHidden[clubId]);
   const muted = useClubs((s) => s.muted[clubId]);
-  const isOwner = club.role === 'owner' || clubId.startsWith('new-');
-  const isPrivateMember = !!club.isPrivate && !isOwner;
+  const isAdmin = club.role === 'admin' || clubId.startsWith('new-');
+  const isPrivateMember = !!club.isPrivate && !isAdmin;
+  // A closed bookclub is read-only. `closedView` opens the member / new-admin variants directly.
+  const closedNow = useClubs((s) => closedEntry(clubId, s));
+  const closedView: ClosedView | null = (params.closedView as ClosedView | undefined) ?? (closedNow ? (closedNow.by === 'you' ? 'admin' : 'member') : null);
+  const closed = !!closedView;
+  const youAdmin = isAdmin || (!!closedView && closedView !== 'member');
 
   const isNew = clubId.startsWith('new-');
   const [loading, setLoading] = useState(!!params.loading || (!isNew && !app.isLoaded(`chat-${clubId}`)));
@@ -104,6 +128,7 @@ export function Chat({ params }: { params: Params }) {
     if (params.toast === 'reported') app.toast('Reported. We’ll review this.', 'success', { bottom: 80 });
     if (params.toast === 'muted') app.toast('Muted for 8 hours', 'success', { bottom: 100, action: { label: 'Undo', run: () => clubs.unmute(clubId) } });
     if (params.toast === 'removed') app.toast('Message removed. Amaka will see why.', 'success', { bottom: 100 });
+    if (params.toast === 'reopened') app.toast('Bookclub reopened. Members have been told.', 'success', { bottom: 100 });
     return () => app.hideToast();
   }, [params.toast, clubId]);
 
@@ -115,9 +140,9 @@ export function Chat({ params }: { params: Params }) {
 
   const actions: SelAction[] = useMemo(() => {
     if (!selMsgs.length) return [];
-    if (one) return one.you || isOwner ? ['reply', 'thread', 'copy', 'delete', 'more'] : ['reply', 'thread', 'copy', 'more'];
+    if (one) return one.you || isAdmin ? ['reply', 'thread', 'copy', 'delete', 'more'] : ['reply', 'thread', 'copy', 'more'];
     return selMsgs.every((m) => m.you) ? ['copy', 'delete'] : ['copy'];
-  }, [selMsgs, one, isOwner]);
+  }, [selMsgs, one, isAdmin]);
 
   // Position the reaction row just above the single selected message.
   useLayoutEffect(() => {
@@ -152,7 +177,7 @@ export function Chat({ params }: { params: Params }) {
     if (a === 'thread' && one) { exitSel(); nav.push('thread', { club: clubId, msg: one.id }); }
     if (a === 'copy') { navigator.clipboard?.writeText(selMsgs.map((m) => m.body).join('\n\n')).catch(() => {}); exitSel(); }
     if (a === 'delete') {
-      if (one && !one.you && isOwner) { setTarget(one.id); setSheet('remove'); return; }
+      if (one && !one.you && isAdmin) { setTarget(one.id); setSheet('remove'); return; }
       setDialog(one ? 'delete-one' : 'delete-many');
     }
     if (a === 'more') setMore((m) => !m);
@@ -191,8 +216,8 @@ export function Chat({ params }: { params: Params }) {
   ) : (
     <ThreadHeader
       title={club.name}
-      subtitle={offline || loading ? (offline ? 'Connecting' : club.sub) : club.sub}
-      loader={offline || loading}
+      subtitle={closed ? 'Closed · read only' : offline ? 'Connecting' : club.sub}
+      loader={!closed && (offline || loading)}
       club={{ art: club.art, palette: club.palette }}
       muted={!!muted}
       onMore={() => setMenu(true)}
@@ -205,7 +230,7 @@ export function Chat({ params }: { params: Params }) {
       {offline ? (
         <ConnectionBanner state="offline" />
       ) : (
-        !catchupHidden && !loading && !isNew && (
+        !catchupHidden && !loading && !isNew && !closed && (
           <CatchUpStrip
             title="3 threads were busy while you were away"
             chips={[
@@ -228,12 +253,12 @@ export function Chat({ params }: { params: Params }) {
               const node = (
                 <Message
                   m={it}
-                  onLike={() => chat.like(clubId, it.id)}
-                  onReplies={() => nav.push('thread', { club: clubId, msg: it.id })}
-                  onReaction={(e) => chat.react(clubId, it.id, e)}
+                  onLike={closed ? undefined : () => chat.like(clubId, it.id)}
+                  onReplies={() => nav.push('thread', { club: clubId, msg: it.id, ...(closed ? { readOnly: true } : null) })}
+                  onReaction={closed ? undefined : (e) => chat.react(clubId, it.id, e)}
                   onRetry={() => chat.retry(clubId, it.id)}
                   onDeleteFailed={() => chat.removePending(clubId, it.id)}
-                  onLongPress={it.state ? undefined : () => { setSel([it.id]); setMenu(false); }}
+                  onLongPress={it.state || closed ? undefined : () => { setSel([it.id]); setMenu(false); }}
                 />
               );
               return (
@@ -245,17 +270,20 @@ export function Chat({ params }: { params: Params }) {
             {msgs.length === 0 && (
               <div className="col" style={{ alignItems: 'center' }}>
                 <EmptyState icon="ChatCircle" title="Your bookclub is ready" body="Start the conversation. Say what drew you to the book, or where you’re up to." />
-                <Button size="sm" kind="secondary" onClick={() => nav.modal('invite', { club: clubId })}>Invite people</Button>
+                {!closed && <Button size="sm" kind="secondary" onClick={() => nav.modal('invite', { club: clubId })}>Invite people</Button>}
               </div>
             )}
           </div>
         )}
       </div>
-      {firstVisit.current && !jumped && !atBottom && !loading && !selecting && !mentionOpts.length && (
+      {firstVisit.current && !jumped && !atBottom && !loading && !selecting && !mentionOpts.length && !closed && (
         <div style={{ position: 'absolute', left: 0, right: 0, bottom: replyTo ? 201 : editing ? 179 : 121, display: 'flex', justifyContent: 'center', zIndex: 6, pointerEvents: 'none' }}>
           <span style={{ pointerEvents: 'auto' }}><JumpToLatest onClick={() => { chat.markJumped(clubId); toBottom(); }} /></span>
         </div>
       )}
+      {closedView ? (
+        <ClosedFooter view={closedView} onReopen={() => { clubs.reopen(clubId); app.toast('Bookclub reopened. Members have been told.', 'success', { bottom: 100 }); }} />
+      ) : (
       <MessageComposer
         value={draft}
         onChange={setDraft}
@@ -274,6 +302,7 @@ export function Chat({ params }: { params: Params }) {
           />
         ) : null}
       />
+      )}
 
       {/* Reaction row for a single selected message */}
       {one && rxTop !== null && !more && (
@@ -300,7 +329,7 @@ export function Chat({ params }: { params: Params }) {
           <div className="scrim" onClick={() => setMenu(false)} />
           <Popover style={{ top: MENU_TOP, right: 8, width: 232, padding: 8 }}>
             <MenuRow icon="Users" label="Bookclub information" onClick={() => { setMenu(false); nav.push('club-info', { club: clubId }); }} />
-            {!isPrivateMember && <MenuRow icon="UserPlus" label="Invite people" onClick={() => { setMenu(false); nav.modal('invite', { club: clubId }); }} />}
+            {!isPrivateMember && !closed && <MenuRow icon="UserPlus" label="Invite people" onClick={() => { setMenu(false); nav.modal('invite', { club: clubId }); }} />}
             {muted ? (
               <MenuRow icon="Bell" label="Unmute bookclub" onClick={() => { setMenu(false); clubs.unmute(clubId); }} />
             ) : (
@@ -359,9 +388,7 @@ export function Chat({ params }: { params: Params }) {
 
       {dialog === 'leave' && (
         <Dialog
-          title="Leave this bookclub?"
-          body={`You’ll stop receiving alerts from ${club.name}. You can rejoin any time.`}
-          confirm="Leave"
+          {...leaveCopy(clubId, club.name, youAdmin)}
           onCancel={() => setDialog(null)}
           onConfirm={() => { clubs.leave(clubId); setDialog(null); app.goTab('bookclubs'); }}
         />

@@ -277,9 +277,9 @@ export function ChooseUsername() {
 
 export const GENRES = ['Fiction', 'Non-fiction', 'Mystery', 'Romance', 'Fantasy', 'Poetry', 'Sci-Fi', 'History', 'Biography', 'Business', 'Self-help', 'Faith', 'African literature', 'Classics', 'Thriller', 'Essays'];
 
-export function PickGenres() {
+export function PickGenres({ params }: { params: Params }) {
   const initial = useApp((s) => s.genres);
-  const [sel, setSel] = useState<string[]>(initial);
+  const [sel, setSel] = useState<string[]>((params.sel as string[]) ?? initial);
   const toggle = (g: string) => setSel((s) => (s.includes(g) ? s.filter((x) => x !== g) : [...s, g]));
   const next = () => { app.set({ genres: sel }); nav.push('join-clubs'); };
   return (
@@ -289,7 +289,7 @@ export function PickGenres() {
       sub="Pick at least 3 and we’ll show you bookclubs worth joining."
       skip={() => nav.push('join-clubs')}
       padTop={12}
-      footer={<Button full disabled={sel.length < 3} onClick={next}>{sel.length ? `Continue with ${sel.length}` : 'Continue'}</Button>}
+      footer={<Button full disabled={sel.length < 3} onClick={next}>{sel.length < 3 ? `Pick ${3 - sel.length} more` : `Continue with ${sel.length}`}</Button>}
     >
       <div className="row" style={{ flexWrap: 'wrap', gap: 8, paddingTop: 8 }}>
         {GENRES.map((g) => <Chip key={g} label={g} on={sel.includes(g)} onClick={() => toggle(g)} />)}

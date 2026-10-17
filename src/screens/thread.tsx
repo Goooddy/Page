@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { nav, type Params } from '../lib/nav';
 import { app, useApp } from '../data/app';
 import { chat, getChat, getReplies, useChat, type Reply } from '../data/chat';
-import { clubById } from '../data/clubs';
+import { clubById, closedEntry, useClubs } from '../data/clubs';
 import { Message, PinnedParent, ReactionRow, SelectRow, SelectionBar, ThreadHeader, isMsg, type ChatMsg, type SelAction } from '../components/ui/chat';
 import { MessageComposer, MentionPicker } from '../components/ui/inputs';
 import { EmptyState, ErrorState, ConnectionBanner, Skeleton } from '../components/ui/states';
@@ -59,6 +59,9 @@ export function Thread({ params }: { params: Params }) {
   const cold = !!params.cold;
   const key = cold ? 'cold' : `${clubId}:${msgId}`;
   const club = clubById(clubId);
+  // Closed bookclubs are read-only: no message box, likes, reactions or select mode.
+  const closedNow = useClubs((s) => !!closedEntry(clubId, s));
+  const readOnly = !!params.readOnly || closedNow;
   const offline = useApp((s) => s.offline);
   const chatItems = useChat((s) => s.chats[clubId]);
   const parent = useMemo(() => cold ? COLD_PARENT : (chatItems ?? getChat(clubId)).filter(isMsg).find((m) => m.id === msgId) ?? (getChat(clubId).filter(isMsg)[1] as ChatMsg), [chatItems, clubId, msgId, cold]);
@@ -152,7 +155,7 @@ export function Thread({ params }: { params: Params }) {
       ) : (
         <div className="screen-body" ref={listRef}>
           <div style={{ padding: 16, background: 'var(--surface-canvas)' }}>
-            <PinnedParent m={parent} onLike={() => chat.like(clubId, parent.id)} replyLabel={replies.length ? `${cold ? replies.length : parent.replies ?? replies.length} replies` : 'No replies yet'} />
+            <PinnedParent m={parent} onLike={readOnly ? undefined : () => chat.like(clubId, parent.id)} replyLabel={replies.length ? `${cold ? replies.length : parent.replies ?? replies.length} replies` : 'No replies yet'} />
           </div>
           {loading ? (
             <div className="col" style={{ padding: '16px 16px 0', gap: 16 }}>
@@ -169,9 +172,9 @@ export function Thread({ params }: { params: Params }) {
                   <Message
                     m={r}
                     variant="reply"
-                    onLike={() => chat.likeReply(key, r.id)}
-                    onReaction={(e) => chat.reactReply(key, r.id, e)}
-                    onLongPress={r.state ? undefined : () => setSel([r.id])}
+                    onLike={readOnly ? undefined : () => chat.likeReply(key, r.id)}
+                    onReaction={readOnly ? undefined : (e) => chat.reactReply(key, r.id, e)}
+                    onLongPress={r.state || readOnly ? undefined : () => setSel([r.id])}
                   />
                 );
                 return (
@@ -179,7 +182,7 @@ export function Thread({ params }: { params: Params }) {
                     {sel.length ? (
                       <SelectRow selected={sel.includes(r.id)} onToggle={() => setSel((s) => { const n = s.includes(r.id) ? s.filter((x) => x !== r.id) : [...s, r.id]; if (!n.length) setMore(false); return n; })}>{node}</SelectRow>
                     ) : (
-                      <SwipeToReply enabled={!r.state} onReply={() => setReplyTo(r.id)}>{node}</SwipeToReply>
+                      <SwipeToReply enabled={!r.state && !readOnly} onReply={() => setReplyTo(r.id)}>{node}</SwipeToReply>
                     )}
                   </div>
                 );
@@ -188,7 +191,7 @@ export function Thread({ params }: { params: Params }) {
           )}
         </div>
       )}
-      {!parentGone && !params.removed && (
+      {!parentGone && !params.removed && !readOnly && (
         <MessageComposer
           value={draft}
           onChange={setDraft}

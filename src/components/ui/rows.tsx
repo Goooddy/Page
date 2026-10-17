@@ -32,11 +32,12 @@ export function BookclubRow({ c, onClick }: { c: ClubRowData; onClick?: () => vo
   );
 }
 
-export function ArchivedRow({ count, onClick }: { count: number; onClick?: () => void }) {
+/** "Closed Row" on Bookclubs: opens the list of closed bookclubs. */
+export function ClosedRow({ count, onClick }: { count: number; onClick?: () => void }) {
   return (
     <button className="row fill" style={{ padding: 12, gap: 8, background: 'var(--surface-sunken)', borderRadius: 12 }} onClick={onClick}>
-      <Icon name="Archive" size={18} tone="secondary" />
-      <span className="t-label c-primary">Archived</span>
+      <Icon name="ChatCircleSlash" size={18} tone="secondary" />
+      <span className="t-label c-primary">Closed</span>
       <span className="t-label-s c-secondary" style={{ padding: '2px 8px', background: 'var(--surface-press)', borderRadius: 999 }}>{count}</span>
       <span className="grow" />
       <Icon name="CaretRight" size={18} tone="tertiary" />
@@ -76,14 +77,14 @@ export const Hairline = ({ style }: { style?: CSSProperties }) => (
 
 /* ——— Member Row ——— */
 export function MemberRow({ name, initials, type = 'member', meta, onMore, onApprove, onDecline }: {
-  name: string; initials: string; type?: 'member' | 'owner' | 'request'; meta?: string; onMore?: () => void; onApprove?: () => void; onDecline?: () => void;
+  name: string; initials: string; type?: 'member' | 'admin' | 'request'; meta?: string; onMore?: () => void; onApprove?: () => void; onDecline?: () => void;
 }) {
   return (
     <div className="row fill" style={{ padding: '8px 0', gap: 12 }}>
       <Avatar initials={initials} size="md" />
       <span className="col grow" style={{ gap: 2, minWidth: 0 }}>
         <span className="t-label-l c-primary trunc">{name}</span>
-        {type !== 'member' && <span className="t-body-s c-secondary">{type === 'owner' ? 'Owner' : meta}</span>}
+        {type !== 'member' && <span className="t-body-s c-secondary">{type === 'admin' ? 'Admin' : meta}</span>}
       </span>
       {type === 'member' && (
         <button onClick={onMore} aria-label="More" style={{ display: 'flex', padding: 12, margin: -12 }}>
@@ -104,6 +105,8 @@ export function MemberRow({ name, initials, type = 'member', meta, onMore, onApp
 export type AlertData = {
   id: string;
   type: 'reply' | 'invitation' | 'request' | 'moderation' | 'mention' | 'resolved';
+  /** moderation-style rows: the icon on the left (Figma swaps it per alert) */
+  icon?: IconName;
   unread?: boolean;
   actor?: string;
   initials?: string;
@@ -116,7 +119,7 @@ export function AlertRow({ a, onClick, onAccept, onDecline, acceptLabel }: {
   const hasActions = a.type === 'invitation' || a.type === 'request';
   return (
     <div className="row fill tap" style={{ padding: '12px 16px', gap: 12, alignItems: 'flex-start', background: a.unread ? 'var(--action-subtle)' : 'var(--surface-default)' }} onClick={onClick}>
-      {a.type === 'moderation' ? <Icon name="ShieldCheck" size={24} tone="secondary" /> : <Avatar initials={a.initials ?? a.actor?.[0] ?? 'A'} size="md" />}
+      {a.type === 'moderation' ? <Icon name={a.icon ?? 'ShieldCheck'} size={24} tone="secondary" /> : <Avatar initials={a.initials ?? a.actor?.[0] ?? 'A'} size="md" />}
       <span className="col grow" style={{ gap: 4, minWidth: 0 }}>
         {a.type === 'mention' ? (
           <span className="t-label c-primary">{a.text}</span>
